@@ -1,0 +1,171 @@
+---
+title: "Event Callbacks"
+description: "Listen to agent events — messages, tool calls, errors, and more"
+---
+
+Hook into the agent's lifecycle to build custom experiences on top of Ourguide.
+
+## Available Callbacks
+
+| Callback                 | Fires when                                    |
+| ------------------------ | --------------------------------------------- |
+| `onMessage`              | A new message (user or assistant) is added     |
+| `onMessageUpdate`        | A message is updated (e.g. during streaming)   |
+| `onToolCall`             | A tool starts, completes, or a client tool is invoked |
+| `onWorkflow`             | A workflow starts, progresses, or ends         |
+| `onVerificationStatus`   | Identity verification status changes           |
+| `onError`                | An error occurs                                |
+
+## React SDK
+
+Pass callbacks via the `client.on()` method:
+
+```javascript
+import { OurguideClient } from '@ourguide/client';
+
+const client = new OurguideClient({
+  productId: 'YOUR_PRODUCT_ID',
+  apiUrl: 'https://api.ourguide.ai',
+});
+
+client.on({
+  onMessage: (message) => {
+    console.log(`[${message.role}] ${message.content}`);
+  },
+  onToolCall: (event) => {
+    if (event.type === 'tool_call_start') {
+      console.log(`Tool started: ${event.toolName}`);
+    }
+    if (event.type === 'tool_call_complete') {
+      console.log(`Tool done: ${event.toolName}`, event.success);
+    }
+  },
+  onError: (error) => {
+    myErrorTracker.capture(error);
+  },
+});
+```
+
+---
+
+## Callback Reference
+
+### onMessage
+
+Fired when a new message is added to the conversation.
+
+```typescript
+onMessage?: (message: Message) => void
+```
+
+```typescript
+interface Message {
+  id: string;
+  content: string;
+  role: 'user' | 'assistant';
+  timestamp: Date;
+  citations?: Citation[];
+  thinking?: string;
+}
+```
+
+### onMessageUpdate
+
+Fired when a message is updated — typically during streaming as the assistant's response accumulates.
+
+```typescript
+onMessageUpdate?: (messageId: string, updates: Partial<Message>) => void
+```
+
+### onToolCall
+
+Fired on tool lifecycle events:
+
+```typescript
+onToolCall?: (event: ToolCallEvent) => void
+```
+
+| `event.type`        | Description                                     |
+| ------------------- | ----------------------------------------------- |
+| `tool_call_start`   | Server-side tool invocation began                |
+| `tool_call_complete`| Server-side tool finished (`event.success`)      |
+| `client_tool_call`  | Client-side tool was invoked in the browser      |
+
+### onWorkflow
+
+```typescript
+onWorkflow?: (event: WorkflowEvent) => void
+```
+
+| `event.type`               | Description                                      |
+| -------------------------- | ------------------------------------------------ |
+| `workflow_started`         | Workflow began (`event.name`, `event.todos`)      |
+| `workflow_todo_updated`    | A step completed (`event.todoId`, `event.status`) |
+| `workflow_ended`           | Workflow finished                                 |
+| `workflow_complete_prompt` | Workflow requests user confirmation               |
+
+### onVerificationStatus
+
+Fired when the user's identity verification status changes — useful for gating features behind verified users.
+
+```typescript
+onVerificationStatus?: (isVerified: boolean) => void
+```
+
+### onError
+
+Fired on any error during streaming or tool execution.
+
+```typescript
+onError?: (error: Error) => void
+```
+
+---
+
+## Use Cases
+
+### Analytics
+
+Track which tools are used and how often:
+
+```javascript
+client.on({
+  onToolCall: (event) => {
+    if (event.type === 'tool_call_complete') {
+      analytics.track('ourguide_tool_used', {
+        tool: event.toolName,
+        success: event.success,
+      });
+    }
+  },
+});
+```
+
+### Custom Loading States
+
+Show your own UI while tools run:
+
+```javascript
+client.on({
+  onToolCall: (event) => {
+    if (event.type === 'tool_call_start') {
+      showToolSpinner(event.toolName);
+    }
+    if (event.type === 'tool_call_complete') {
+      hideToolSpinner();
+    }
+  },
+});
+```
+
+### Error Reporting
+
+Pipe errors to your observability stack:
+
+```javascript
+client.on({
+  onError: (error) => {
+    Sentry.captureException(error);
+  },
+});
+```

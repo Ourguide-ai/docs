@@ -1,0 +1,353 @@
+---
+title: "Server-Side MCP Authentication"
+description: "Service keys, identity headers, and how the full auth chain works"
+---
+
+This page explains exactly how authentication works when Ourguide calls your MCP server, and how your MCP server authenticates with your own backend API. Every header, every token, every hop.
+
+## The Auth Chain
+
+There are three hops in the full chain:
+
+```
+┌──────────┐        ┌─────────────────┐        ┌────────────┐        ┌─────────────┐
+│  Widget  │──(1)──→│ Ourguide Backend│──(2)──→│ MCP Server │──(3)──→│ Backend API │
+│(browser) │        │                 │        │  (yours)   │        │   (yours)   │
+└──────────┘        └─────────────────┘        └────────────┘        └─────────────┘
+```
+
+### Hop 1: Widget → Ourguide Backend
+
+The widget sends the user's identity token (a JWT your backend minted) with every chat message.
+
+| What         | Value                                                              |
+| ------------ | ------------------------------------------------------------------ |
+| Token        | Identity JWT (signed with your Ourguide verification secret)       |
+| Sent as      | `identity_token` field in the chat request body                    |
+| Validated by | Ourguide backend using your product's verification secret          |
+| Purpose      | Proves who the end user is                                         |
+
+<Note>
+  This is the standard [Identity Verification](/identity-verification) flow. If you haven't set it up, users are treated as anonymous and identity headers won't be available.
+</Note>
+
+### Hop 2: Ourguide Backend → Your MCP Server
+
+When Ourguide connects to your MCP server to execute tools, it sends three types of headers:
+
+| Header           | Source                                       | Example Value                  |
+| ---------------- | -------------------------------------------- | ------------------------------ |
+| `X-Service-Key`  | Auto-injected from your product's service key| `HCF8nVjR8Y...`               |
+| Static headers   | Whatever you configured in the dashboard     | `Authorization: Bearer sk-...` |
+| Identity headers | Resolved from header mappings (see below)    | `X-User-ID: user_456`          |
+
+Your MCP server automatically receives the service key — Ourguide reads it from your product config and injects it into every request. You don't need to configure anything for this to happen.
+
+### Hop 3: Your MCP Server → Your Backend API
+
+Your MCP server wraps your existing backend API. When a tool executes, it calls your API endpoints to do the actual work.
+
+| What         | Value                                                                     |
+| ------------ | ------------------------------------------------------------------------- |
+| Header       | `X-Service-Key`                                                           |
+| Value        | The same service key from hop 2, forwarded by your MCP server             |
+| Validated by | Your backend's auth middleware                                            |
+| Purpose      | Proves the request is from a trusted service (your MCP server, called by Ourguide) |
+
+<Note>
+  Your existing user auth (Clerk, Auth0, Firebase, etc.) stays completely unchanged. The service key adds a second auth path alongside it — it doesn't replace anything.
+</Note>
+
+## Service Keys
+
+A service key is a shared secret that lets your MCP server authenticate with your backend API. Think of it like a Stripe secret key — Ourguide generates it, you copy it to your backend.
+
+```
+Ourguide generates and stores the service key
+│
+├──→ Ourguide auto-injects it as X-Service-Key header
+│    when calling your MCP server (Hop 2)
+│
+└──→ You copy it from the dashboard and add it to
+     your backend's .env file (for Hop 3 validation)
+```
+
+| Where              | Env Var                                         | Purpose                                          |
+| ------------------ | ----------------------------------------------- | ------------------------------------------------ |
+| Your MCP server    | Received automatically via `X-Service-Key` header from Ourguide | Forwarded to your backend API    |
+| Your backend API   | `MCP_SERVICE_KEY` in `.env`                     | Validates incoming requests from the MCP server  |
+
+<Note>
+  Ourguide is the source of truth. You never generate the key yourself.
+</Note>
+
+### Where to Find Your Service Key
+
+1. Go to **Deploy → API Keys** in the Ourguide dashboard
+2. Copy the **Service Key**
+3. Add it to your backend's `.env`:
+
+```bash
+MCP_SERVICE_KEY=HCF8nVjR8YON5eBzlMHuTqO8IwD3c0DSynVnTKq5/80=
+```
+
+### Adding Service Key Auth to Your Backend
+
+Add a ~15-line middleware alongside your existing auth. This does **not** replace your current auth — it adds a second path.
+
+<CodeGroup>
+
+```python Python (FastAPI)
+import os, hmac
+from fastapi import Request, HTTPException
+
+SERVICE_KEY = os.environ.get("MCP_SERVICE_KEY", "")
+
+async def verify_auth(request: Request):
+    """Dual-path auth: service key (MCP server) OR user JWT (browsers).
+    Path 1: Service key present → trusted service, read user from headers
+    Path 2: No service key → normal user auth (Clerk, Auth0, etc.)
+    """
+    # Path 1: Service key (from MCP server via Ourguide)
+    service_key = request.headers.get("x-service-key")
+    if service_key and SERVICE_KEY:
+        if hmac.compare_digest(service_key, SERVICE_KEY):
+            # Trusted — read user context from headers
+            request.state.user_id = request.headers.get("x-user-id")
+            request.state.tenant_id = request.headers.get("x-tenant-id")
+            request.state.auth_type = "service_key"
+            return
+
+    # Path 2: Normal user auth (your existing flow, unchanged)
+    authorization = request.headers.get("authorization", "")
+    if authorization.startswith("Bearer "):
+        token = authorization.removeprefix("Bearer ")
+        claims = await verify_user_jwt(token)  # your existing function
+        request.state.user_id = claims.get("user_id")
+        request.state.tenant_id = claims.get("tenant_id")
+        request.state.auth_type = "user_jwt"
+        return
+
+    raise HTTPException(status_code=401, detail="Unauthorized")
+```
+
+</CodeGroup>
+
+<Warning>
+  Always use constant-time comparison (`hmac.compare_digest` in Python, `crypto.timingSafeEqual` in Node) to prevent timing attacks. Never use `==` to compare secrets.
+</Warning>
+
+When the service key is present, your backend trusts the scoping headers (`X-User-ID`, `X-Tenant-ID`, etc.) because the caller has proven it's a trusted service. Without the service key, those headers are ignored and normal user auth applies.
+
+### Your MCP Server — Forwarding the Key
+
+Your MCP server receives `X-Service-Key` from Ourguide automatically. It just needs to include it when calling your backend:
+
+```python
+import os
+import httpx
+from fastmcp import FastMCP
+from fastmcp.dependencies import Depends, CurrentHeaders
+
+mcp = FastMCP("My Backend")
+
+# Your backend API (not Ourguide's)
+API_BASE = os.environ.get("API_BASE_URL", "http://localhost:8000")
+
+async def get_api_client(headers: dict = CurrentHeaders()) -> httpx.AsyncClient:
+    """HTTP client that forwards the service key to your backend."""
+    key = os.environ.get("SERVICE_KEY", "") or headers.get("x-service-key", "")
+    return httpx.AsyncClient(
+        base_url=API_BASE,
+        headers={
+            "Content-Type": "application/json",
+            "X-Service-Key": key,           # Forward to your backend
+            "X-User-ID": headers.get("x-user-id", ""),    # Forward user context
+            "X-Tenant-ID": headers.get("x-tenant-id", ""),
+        },
+        timeout=30.0,
+    )
+
+@mcp.tool()
+async def get_order(
+    order_id: str,
+    client: httpx.AsyncClient = Depends(get_api_client),
+) -> dict:
+    """Look up an order."""
+    resp = await client.get(f"/api/orders/{order_id}")
+    resp.raise_for_status()
+    return resp.json()
+```
+
+<Note>
+  For local development, you can set `SERVICE_KEY` as an env var on the MCP server as a fallback. In production, the header from Ourguide is the primary source.
+</Note>
+
+## Identity Headers
+
+Identity headers let your MCP server (and your backend) know who the end user is. Ourguide extracts claims from the user's identity token and sends them as HTTP headers.
+
+### How Identity Flows Through the Chain
+
+1. Your backend mints an identity JWT for the widget:
+   ```json
+   { "user_id": "user_456", "email": "alice@example.com", "tenant_id": "t_789" }
+   ```
+2. Widget sends it to Ourguide with every chat message
+3. Ourguide decodes the JWT and has the claims available
+4. For each header mapping you configured, Ourguide resolves the value:
+   ```
+   identity.user_id   → "user_456"
+   identity.email     → "alice@example.com"
+   identity.tenant_id → "t_789"
+   ```
+5. Ourguide sends these as HTTP headers to your MCP server:
+   ```
+   X-User-ID: user_456
+   X-Email: alice@example.com
+   X-Tenant-ID: t_789
+   ```
+6. Your MCP server forwards them to your backend API
+
+### Configuring Header Mappings
+
+In the dashboard, under **Integration → Server-Side MCP → Header Mappings**, add mappings:
+
+| Header Name   | Source                 | What It Sends                    |
+| ------------- | ---------------------- | -------------------------------- |
+| `X-User-ID`   | `identity.user_id`     | The logged-in user's ID          |
+| `X-Email`     | `identity.email`       | The user's email                 |
+| `X-Tenant-ID` | `identity.tenant_id`   | Custom claim from your JWT       |
+| `X-Product-ID`| `product.id`           | The Ourguide product ID          |
+
+### Available Sources
+
+**`identity.*`** — Any claim from the user's identity JWT:
+
+| Source                | Value                                                    |
+| --------------------- | -------------------------------------------------------- |
+| `identity.user_id`    | User ID (from `user_id` claim)                           |
+| `identity.email`      | Email (from `email` claim)                               |
+| `identity.name`       | Name (from `name` claim)                                 |
+| `identity.<custom>`   | Any custom claim you include when minting the JWT        |
+
+<Note>
+  Identity claims are only available for authenticated users. If the user hasn't been identified via [Identity Verification](/identity-verification), identity headers won't be sent.
+</Note>
+
+**`product.*`** — Fields from the Ourguide product configuration:
+
+| Source                      | Value                                 |
+| --------------------------- | ------------------------------------- |
+| `product.id`                | The product ID                        |
+| `product.name`              | The product display name              |
+| `product.organization_id`   | The org that owns this product        |
+
+### Reading Identity Headers in Your MCP Server
+
+```python
+from fastmcp.dependencies import Depends, CurrentHeaders
+
+async def get_user_id(headers: dict = CurrentHeaders()) -> str:
+    """Read user ID forwarded by Ourguide."""
+    return headers.get("x-user-id", "")
+
+@mcp.tool()
+async def get_my_orders(
+    user_id: str = Depends(get_user_id),
+) -> dict:
+    """Get orders for the current user."""
+    if not user_id:
+        return {"error": "User not authenticated"}
+    return await db.orders.find_by_user(user_id)
+```
+
+## Putting It All Together
+
+Dashboard configuration:
+```
+Server-Side MCP:
+  Name: my-backend
+  URL: https://mcp.yourapp.com/mcp
+  Transport: Streamable HTTP
+  Header Mappings:
+    X-User-ID   ← identity.user_id
+    X-Tenant-ID ← identity.tenant_id
+```
+
+Your backend `.env`:
+```bash
+MCP_SERVICE_KEY=HCF8nVjR8YON5eBzlMHuTqO8IwD3c0DSynVnTKq5/80=
+```
+
+Your MCP server:
+
+```python
+import os
+import httpx
+from fastmcp import FastMCP
+from fastmcp.dependencies import Depends, CurrentHeaders
+
+mcp = FastMCP("My Backend")
+API_BASE = os.environ.get("API_BASE_URL", "https://api.yourapp.com")
+
+async def get_api_client(headers: dict = CurrentHeaders()) -> httpx.AsyncClient:
+    return httpx.AsyncClient(
+        base_url=API_BASE,
+        headers={
+            "Content-Type": "application/json",
+            "X-Service-Key": headers.get("x-service-key", ""),
+            "X-User-ID": headers.get("x-user-id", ""),
+            "X-Tenant-ID": headers.get("x-tenant-id", ""),
+        },
+        timeout=30.0,
+    )
+
+@mcp.tool()
+async def get_my_orders(
+    client: httpx.AsyncClient = Depends(get_api_client),
+) -> dict:
+    """Get the current user's recent orders."""
+    resp = await client.get("/api/orders/mine")
+    resp.raise_for_status()
+    return resp.json()
+```
+
+What happens when a user asks "show me my orders":
+
+```
+1. Widget → Ourguide:      identity_token (JWT with user_id: "user_456")
+2. Ourguide validates JWT, extracts user_id
+3. Ourguide → MCP server:  X-Service-Key: HCF8n..., X-User-ID: user_456
+4. MCP server → Backend:   X-Service-Key: HCF8n..., X-User-ID: user_456
+5. Backend validates service key ✓, reads X-User-ID
+6. Backend queries orders for user_456
+7. Returns orders → MCP server → Ourguide → Widget → User sees their order list
+```
+
+## Edge Cases
+
+| Scenario                        | What Happens                                                                                     |
+| ------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Anonymous user (no identity token) | Identity headers are not sent. Tools still work for non-user-specific actions.               |
+| Service key not set on product  | `X-Service-Key` header is not sent. Your MCP server won't be able to authenticate with your backend. |
+| Identity claim doesn't exist    | If a header mapping references a claim not in the JWT, that header is simply not sent. No error. |
+| MCP server is down              | Ourguide surfaces an error to the user: "Could not connect to the MCP server." The agent continues without those tools. |
+
+## Security Checklist
+
+<Check>Never expose your service key client-side. It's a server-to-server secret between your MCP server and your backend.</Check>
+<Check>Always validate the service key in your backend middleware.</Check>
+<Check>Use constant-time comparison for secret validation — never `==`.</Check>
+<Check>Set up [Identity Verification](/identity-verification) if your tools need to know who the user is.</Check>
+<Check>Use HTTPS in production for your MCP server URL.</Check>
+
+## Troubleshooting
+
+| Issue                             | Cause                               | Fix                                                                                  |
+| --------------------------------- | ----------------------------------- | ------------------------------------------------------------------------------------ |
+| Your backend returns `401`        | Service key mismatch or not set     | Copy the service key from **Deploy → API Keys** and add to your backend's `.env`    |
+| Identity headers are empty        | User not authenticated in the widget| Set up [Identity Verification](/identity-verification), ensure frontend calls `identify()` |
+| `X-Service-Key` header missing    | No service key on the product       | Check **Deploy → API Keys** in dashboard                                             |
+| MCP server not receiving headers  | Wrong transport                     | Use Streamable HTTP (not SSE) for header support                                     |
+| Custom claims not forwarded       | Claim not in JWT                    | Ensure your backend includes the claim when minting the identity token               |

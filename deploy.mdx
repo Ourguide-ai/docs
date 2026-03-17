@@ -1,0 +1,83 @@
+---
+title: "Deploy"
+description: "Go live with your agent"
+---
+
+## Get Your Embed Code
+
+Go to [dashboard.ourguide.ai/deploy](https://dashboard.ourguide.ai/deploy) and copy your embed code:
+
+```html
+<script
+  src="https://api.ourguide.ai/static/ourguide-widget.js"
+  data-api-url="https://api.ourguide.ai"
+  data-product-id="YOUR_PRODUCT_ID"
+></script>
+```
+
+## Get Your Security Key
+
+Same page — click the eye icon to reveal. Use this to sign JWTs for [Identity Verification](/identity-verification).
+
+<Warning>
+  Keep your security key secret. Never expose in client-side code.
+</Warning>
+
+---
+
+## Pre-launch Checklist
+
+### Agent
+
+- [ ] Name and instructions configured
+- [ ] Tested in Sandbox
+
+### Knowledge Base
+
+- [ ] Docs uploaded / website crawled / Notion connected
+- [ ] Agent answers common questions correctly
+
+### Integrations (if applicable)
+
+- [ ] OpenAPI spec uploaded
+- [ ] Auth configured
+- [ ] Tools enabled in Actions
+
+### Identity (if applicable)
+
+- [ ] JWT endpoint implemented
+- [ ] `identify()` called in frontend
+- [ ] `resetUser()` called on logout
+
+---
+
+## Test in Production
+
+<Steps>
+  <Step title="Visit your site">
+    The widget should appear in the bottom-right corner.
+  </Step>
+  <Step title="Test as anonymous user">
+    Ask general questions and verify the agent responds correctly.
+  </Step>
+  <Step title="Test as authenticated user">
+    If using identity verification, log in and verify personalized responses.
+  </Step>
+  <Step title="Try common questions">
+    Test the questions your users are most likely to ask.
+  </Step>
+  <Step title="Verify tool actions work">
+    If using API integrations, trigger tool actions and confirm they execute correctly.
+  </Step>
+</Steps>
+
+---
+
+## Monitor
+
+Use the [Activity](/activity) dashboard to track conversations and spot issues. You can:
+
+- View live and past conversations
+- See which tools are being called
+- Identify common questions that need better answers
+- Monitor error rates and response quality

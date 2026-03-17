@@ -1,0 +1,294 @@
+---
+title: "Flutter"
+description: "Add Ourguide to your Flutter app"
+---
+
+The `ourguide_flutter` package adds Ourguide to any Flutter app. Use `OurguideWidget` for a floating chat button that overlays your existing app, drop in `OurguideChatView` for a full-screen chat experience, or use `OurguideChatNotifier` directly to build a fully custom interface.
+
+## Installation
+
+```bash
+flutter pub add ourguide_flutter
+```
+
+## Quick Start
+
+### Floating Widget (Recommended)
+
+Add `OurguideWidget` inside a `Stack` to get a floating chat button that slides up a chat sheet — zero extra UI work:
+
+```dart
+import 'package:ourguide_flutter/ourguide_flutter.dart';
+import 'package:flutter/material.dart';
+
+void main() => runApp(
+  const OurguideScope(
+    productId: 'YOUR_PRODUCT_ID',
+    child: MyApp(),
+  ),
+);
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      // builder wraps every route — OurguideWidget appears on all pages
+      builder: (context, child) => Stack(
+        children: [child!, const OurguideWidget()],
+      ),
+      home: const HomeScreen(),
+    );
+  }
+}
+```
+
+<Note>
+  Placing `OurguideWidget` in `MaterialApp.builder` means it automatically appears on every page and route in your app — no need to add it to each screen individually. Tapping the button slides up a chat sheet at 85% screen height.
+</Note>
+
+### Full-Screen Chat
+
+Wrap your app with `OurguideScope` and drop in `OurguideChatView` as the full body:
+
+```dart
+import 'package:ourguide_flutter/ourguide_flutter.dart';
+import 'package:flutter/material.dart';
+
+void main() => runApp(
+  const OurguideScope(
+    productId: 'YOUR_PRODUCT_ID',
+    child: MyApp(),
+  ),
+);
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      home: Scaffold(body: OurguideChatView()),
+    );
+  }
+}
+```
+
+`OurguideChatView` includes message bubbles, streaming, conversation history, suggested actions, and a "Powered by Ourguide" footer — no additional setup required.
+
+## OurguideScope Props
+
+`OurguideScope` is an `InheritedWidget` that provides the client and state down the widget tree.
+
+| Prop            | Required | Description                                                  |
+| --------------- | -------- | ------------------------------------------------------------ |
+| `productId`     | Yes      | Your product ID from the dashboard                           |
+| `apiUrl`        | No       | API URL (defaults to `https://dashboard.ourguide.ai`)       |
+| `model`         | No       | Override the default model                                   |
+| `identityToken` | No       | JWT token for authenticated users                            |
+| `storage`       | No       | Custom storage adapter. Defaults to SharedPreferences        |
+
+## OurguideWidget Props
+
+| Prop    | Required | Description                                             |
+| ------- | -------- | ------------------------------------------------------- |
+| `theme` | No       | `OurguideTheme` instance to customize the chat sheet appearance |
+
+## OurguideChatView Props
+
+| Prop    | Required | Description                                        |
+| ------- | -------- | -------------------------------------------------- |
+| `theme` | No       | `OurguideTheme` instance to customize appearance   |
+
+## Theming
+
+Customize colors and styles via `OurguideTheme`:
+
+```dart
+OurguideChatView(
+  theme: OurguideTheme(
+    backgroundColor: Colors.white,
+    userBubbleColor: Colors.white,
+    userBubbleTextColor: const Color(0xFF111827),
+    assistantBubbleColor: Colors.black,
+    assistantBubbleTextColor: Colors.white,
+    inputBorderColor: const Color(0xFFE5E7EB),
+    sendButtonColor: Colors.black,
+    bubbleBorderRadius: 18.0,
+    poweredByColor: const Color(0xFF9CA3AF),
+  ),
+)
+```
+
+### Theme Properties
+
+| Property                  | Description                                       |
+| ------------------------- | ------------------------------------------------- |
+| `backgroundColor`         | Chat background color                             |
+| `userBubbleColor`         | User message bubble background                    |
+| `userBubbleTextColor`     | User message text color                           |
+| `assistantBubbleColor`    | Assistant bubble background                       |
+| `assistantBubbleTextColor`| Assistant message text color                      |
+| `sendButtonColor`         | Send button color                                 |
+| `bubbleBorderRadius`      | Corner radius for message bubbles                 |
+| `inputBorderColor`        | Input bar border color                            |
+| `inputBorderLoadingColor` | Input border color while streaming                |
+| `poweredByColor`          | "Powered by Ourguide" text color                  |
+| `headerBorderColor`       | Bottom border of the header                       |
+| `messageTextStyle`        | Full `TextStyle` override for message text        |
+| `inputDecoration`         | Full `InputDecoration` override for the text field|
+
+## Custom UI (Headless)
+
+Access `OurguideChatNotifier` directly via `OurguideScope.chatOf(context)` to build your own UI:
+
+```dart
+class MyChatScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final notifier = OurguideScope.chatOf(context);
+
+    return ListenableBuilder(
+      listenable: notifier,
+      builder: (context, _) {
+        final state = notifier.state;
+        return Column(
+          children: [
+            Expanded(
+              child: ListView.builder(
+                itemCount: state.messages.length,
+                itemBuilder: (context, i) => Text(state.messages[i].content),
+              ),
+            ),
+            if (state.isLoading) const CircularProgressIndicator(),
+          ],
+        );
+      },
+    );
+  }
+}
+```
+
+### OurguideChatState
+
+| Property           | Type                      | Description                                    |
+| ------------------ | ------------------------- | ---------------------------------------------- |
+| `messages`         | `List<Message>`           | All messages in the current conversation       |
+| `isLoading`        | `bool`                    | Agent is currently streaming a response        |
+| `suggestedActions` | `List<SuggestedAction>`   | Quick reply suggestions from the agent         |
+| `isIdentified`     | `bool`                    | A token has been set for this user             |
+| `isVerified`       | `bool`                    | Server confirmed the user's identity           |
+
+### OurguideChatNotifier Methods
+
+| Method                    | Description                                  |
+| ------------------------- | -------------------------------------------- |
+| `sendMessage(String)`     | Send a message and stream the response       |
+| `stop()`                  | Cancel the current streaming response        |
+| `clear()`                 | Clear messages and start a new conversation  |
+| `identify(IdentifyOptions)`| Set a user identity token                   |
+| `resetUser()`             | Log out the current user                     |
+
+### Message Type
+
+```dart
+class Message {
+  final String id;
+  final MessageRole role; // MessageRole.user or MessageRole.assistant
+  final String content;
+  final DateTime timestamp;
+  final bool isStreaming;
+  final List<Citation> citations;
+}
+```
+
+## User Identity
+
+Identify users to enable conversation history and personalized responses:
+
+```dart
+final notifier = OurguideScope.chatOf(context);
+
+// From a login handler
+final token = await fetchTokenFromYourBackend();
+notifier.identify(IdentifyOptions(token: token));
+
+// Or pass via OurguideScope props (auto-updates when token changes)
+OurguideScope(
+  productId: 'YOUR_PRODUCT_ID',
+  identityToken: userToken,
+  child: MyApp(),
+)
+
+// Logout
+notifier.resetUser();
+```
+
+See [Identity Verification](/identity-verification) for generating tokens on your backend.
+
+## Client-Side Tools
+
+Register tools that run natively in your Flutter app:
+
+```dart
+final client = OurguideScope.clientOf(context);
+
+client.registerTool('navigateToScreen', (params) async {
+  final screen = params['screen'] as String;
+  Navigator.pushNamed(context, '/$screen');
+  return ToolResult.success({'navigated_to': screen});
+});
+
+client.registerTool('addToCart', (params) async {
+  final productId = params['product_id'] as String;
+  await cartController.add(productId);
+  return ToolResult.success({'added': productId});
+});
+```
+
+Upload tool definitions on the [Actions](/actions) page so the agent knows when to call them.
+
+## Platform Support
+
+| Platform | Support |
+| -------- | ------- |
+| iOS      | ✅      |
+| Android  | ✅      |
+| macOS    | ✅      |
+| Web      | ✅      |
+
+### iOS / macOS
+
+No additional configuration needed. For macOS apps, add the outbound networking entitlement — required for all network calls, including production:
+
+```xml
+<!-- macos/Runner/DebugProfile.entitlements -->
+<key>com.apple.security.network.client</key>
+<true/>
+```
+
+## Differences from Other SDKs
+
+| Feature    | Web (`@ourguide/ui`)    | React Native              | Flutter                      |
+| ---------- | ----------------------- | ------------------------- | ---------------------------- |
+| Language   | TypeScript              | TypeScript                | Dart                         |
+| Drop-in UI | `<OurguideWidget />`    | `<OurguideWidget />`      | `OurguideWidget`             |
+| State      | `useChat()` hook        | `useChat()` hook          | `OurguideChatNotifier`       |
+| Storage    | localStorage            | AsyncStorage adapter      | SharedPreferences (built-in) |
+| Provider   | `<OurguideProvider>`    | `<OurguideProvider>`      | `OurguideScope`              |
+
+<CardGroup cols={2}>
+  <Card title="Identity Verification" icon="shield-halved" href="/identity-verification">
+    Generate JWT tokens on your backend
+  </Card>
+  <Card title="Client-Side Tools" icon="wrench" href="/client-side-tools">
+    Register tools the agent can call
+  </Card>
+  <Card title="React Native" icon="mobile" href="/react-native">
+    React Native SDK guide
+  </Card>
+  <Card title="Embed Widget" icon="code" href="/embed-widget">
+    Web widget installation guide
+  </Card>
+</CardGroup>

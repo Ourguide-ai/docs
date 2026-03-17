@@ -1,0 +1,51 @@
+---
+title: "API Integration"
+description: "Connect your REST API so the agent can take actions"
+---
+
+API Integration lets your Ourguide agent call your backend to perform actions like checking order status, canceling subscriptions, or updating user profiles.
+
+## How It Works
+
+1. You provide an **OpenAPI spec** describing your API endpoints
+2. Ourguide maps those endpoints to agent capabilities
+3. When a user asks the agent to do something, it calls the appropriate endpoint
+
+## Adding Your OpenAPI Spec
+
+1. Go to **API Integration** in your dashboard
+2. Upload your OpenAPI/Swagger spec (JSON or YAML)
+3. Ourguide will parse the spec and show available endpoints
+4. Select which endpoints the agent can access
+
+```yaml Example OpenAPI Spec
+openapi: "3.0.0"
+info:
+  title: "My API"
+  version: "1.0.0"
+paths:
+  /orders/{id}:
+    get:
+      summary: "Get order status"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: "Order details"
+```
+
+## Authentication
+
+Your API likely requires authentication. See [OpenAPI Auth](/openapi-auth) for supported auth methods.
+
+## Testing
+
+After connecting your API, test it in the dashboard:
+
+1. Open the **Sandbox** 
+2. Ask the agent to perform an action (e.g., "Check order #1234")
+3. Verify the agent calls the correct endpoint with the right parameters

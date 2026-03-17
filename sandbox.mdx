@@ -1,0 +1,67 @@
+---
+title: "Sandbox"
+description: "Configure and test your agent"
+---
+
+The Sandbox is where you configure your agent and test responses in real-time.
+
+## Configuration
+
+| Field          | Description                              |
+| -------------- | ---------------------------------------- |
+| **Agent Name** | Displayed in the widget header           |
+| **System Prompt** | Instructions that define agent behavior |
+
+## Writing a System Prompt
+
+<CodeGroup>
+
+```text Basic
+You are a support agent for [Company Name].
+Help users with questions about [your product].
+Be friendly and concise.
+```
+
+```text With Boundaries
+You are a support agent for [Company Name].
+Help users with questions about [your product].
+
+Rules:
+- Only answer questions related to our product
+- Do not discuss competitors
+- If you don't know the answer, say so and offer to connect with a human
+- Never share internal pricing or roadmap details
+```
+
+```text With Product Context
+You are a support agent for [Company Name].
+Our product helps teams [what your product does].
+
+Key features:
+- [Feature 1]: [Brief description]
+- [Feature 2]: [Brief description]
+- [Feature 3]: [Brief description]
+
+Pricing: [Starter $X/mo, Pro $X/mo, Enterprise custom]
+
+Common issues:
+- [Issue 1]: [Solution]
+- [Issue 2]: [Solution]
+```
+
+</CodeGroup>
+
+## Live Preview
+
+The right panel shows a live widget preview. Changes apply immediately — test different scenarios before deploying.
+
+## Tips
+
+<Tip>
+**Write effective system prompts:**
+
+- **Be specific** about your product, not generic
+- **Set boundaries** for what the agent should/shouldn't discuss
+- **Include key info** like pricing, features, common solutions
+- **Test edge cases** in the preview before going live
+</Tip>

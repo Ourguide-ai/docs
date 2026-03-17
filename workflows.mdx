@@ -1,0 +1,70 @@
+---
+title: "Workflows"
+description: "Create guided multi-step flows"
+---
+
+Workflows guide users through complex tasks with a structured sequence of steps.
+
+## Examples
+
+- **Onboarding** — Walk new users through setup
+- **Returns** — Collect order number, reason, process request
+- **Troubleshooting** — Diagnostic steps for common issues
+
+## Create a Workflow
+
+<Steps>
+  <Step title="Navigate to Workflows">
+    Go to [Actions](https://dashboard.ourguide.ai/actions) in your dashboard.
+  </Step>
+  <Step title="Create a new workflow">
+    Click **Create Journey**.
+  </Step>
+  <Step title="Fill in details">
+    | Field           | Description                                                        |
+    | --------------- | ------------------------------------------------------------------ |
+    | **Name**        | Short name (e.g., "Return Request")                                |
+    | **Description** | When to trigger (e.g., "Use when customer wants to return a product") |
+  </Step>
+  <Step title="Add steps">
+    For each step, define:
+    - **Step text** — What to ask or tell the user
+    - **Tool** (optional) — Action to execute at this step
+  </Step>
+  <Step title="Save">
+    Save your workflow and test it in the Sandbox.
+  </Step>
+</Steps>
+
+## Example: Return Request
+
+```text
+Step 1: "What's the order number for the item you'd like to return?"
+
+Step 2: "Which item would you like to return?"
+        → Tool: getOrderDetails
+
+Step 3: "What's the reason for the return?"
+
+Step 4: "Done! You'll receive a return label within 24 hours."
+        → Tool: createReturnLabel
+```
+
+## How It Works
+
+1. User question matches workflow description
+2. Agent starts the flow
+3. User responds to each step
+4. Optional tools execute at configured steps
+5. Workflow completes
+
+<Info>
+  Users can exit anytime by asking something else.
+</Info>
+
+## Tips
+
+- **Write clear descriptions** so the agent knows when to trigger the workflow
+- **Keep steps conversational**, not robotic
+- **End with confirmation** of what happened
+- **Test in Sandbox** before deploying

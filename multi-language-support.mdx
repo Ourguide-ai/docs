@@ -1,0 +1,120 @@
+---
+title: "Multi-Language Support"
+description: "Make the AI respond in your user's language"
+---
+
+Pass a `language` prop to the widget and Ourguide handles the rest — the AI responds in that language and the welcome message is translated automatically.
+
+**Example:** Your platform has users who speak Spanish, Japanese, and French. Set `language="es"` for Spanish users and the entire experience adapts — no prompt engineering needed.
+
+## How It Works
+
+1. You pass a language code (ISO 639-1) when embedding the widget
+2. Ourguide translates the welcome message on the fly
+3. A language instruction is injected into the AI's system prompt
+4. The AI responds in the specified language for the entire conversation
+
+<Info>
+  When no language is passed (or `language="en"`), behavior is unchanged — fully backward compatible.
+</Info>
+
+## Pass Language to Widget
+
+<CodeGroup>
+
+```html Script Tag
+<script
+  src="https://dashboard.ourguide.ai/static/ourguide-widget.js"
+  data-api-url="https://dashboard.ourguide.ai"
+  data-product-id="YOUR_PRODUCT_ID"
+  data-language="es"
+></script>
+```
+
+```jsx React SDK
+import { OurguideWidget } from "@ourguide/react";
+
+export default function App() {
+  const language = user.locale || navigator.language.split('-')[0];
+
+  return (
+    <OurguideWidget
+      apiUrl="https://dashboard.ourguide.ai"
+      productId="YOUR_PRODUCT_ID"
+      language={language}
+    />
+  );
+}
+```
+
+</CodeGroup>
+
+| Attribute       | Required | Description                                      |
+| --------------- | -------- | ------------------------------------------------ |
+| `data-language` | No       | ISO 639-1 language code (e.g., `es`, `fr`, `ja`) |
+
+You can set `language` dynamically based on the logged-in user's locale, browser settings, or any other runtime value.
+
+## What Gets Translated
+
+| Element                  | Behavior                                                                 |
+| ------------------------ | ------------------------------------------------------------------------ |
+| Welcome message          | Translated automatically when the widget loads (uses a fast LLM call)   |
+| AI responses             | All replies are in the specified language for the entire conversation    |
+| Error messages from AI   | Also in the specified language                                           |
+| Widget UI chrome         | Not translated (buttons, placeholders remain in English)                 |
+
+## Supported Languages
+
+Ourguide supports the following ISO 639-1 codes:
+
+| Code | Language    | Code | Language   | Code | Language    |
+| ---- | ----------- | ---- | ---------- | ---- | ----------- |
+| `af` | Afrikaans   | `hr` | Croatian   | `nl` | Dutch       |
+| `am` | Amharic     | `hu` | Hungarian  | `no` | Norwegian   |
+| `ar` | Arabic      | `hy` | Armenian   | `pa` | Punjabi     |
+| `az` | Azerbaijani | `id` | Indonesian | `pl` | Polish      |
+| `be` | Belarusian  | `is` | Icelandic  | `pt` | Portuguese  |
+| `bg` | Bulgarian   | `it` | Italian    | `ro` | Romanian    |
+| `bn` | Bengali     | `ja` | Japanese   | `ru` | Russian     |
+| `bs` | Bosnian     | `ka` | Georgian   | `si` | Sinhala     |
+| `ca` | Catalan     | `kk` | Kazakh     | `sk` | Slovak      |
+| `cs` | Czech       | `km` | Khmer      | `sl` | Slovenian   |
+| `cy` | Welsh       | `kn` | Kannada    | `sq` | Albanian    |
+| `da` | Danish      | `ko` | Korean     | `sr` | Serbian     |
+| `de` | German      | `lo` | Lao        | `sv` | Swedish     |
+| `el` | Greek       | `lt` | Lithuanian | `sw` | Swahili     |
+| `en` | English     | `lv` | Latvian    | `ta` | Tamil       |
+| `es` | Spanish     | `mk` | Macedonian | `te` | Telugu      |
+| `et` | Estonian    | `ml` | Malayalam  | `th` | Thai        |
+| `fa` | Persian     | `mn` | Mongolian  | `tl` | Filipino    |
+| `fi` | Finnish     | `mr` | Marathi    | `tr` | Turkish     |
+| `fr` | French      | `ms` | Malay      | `uk` | Ukrainian   |
+| `ga` | Irish       | `my` | Burmese    | `ur` | Urdu        |
+| `gl` | Galician    | `ne` | Nepali     | `uz` | Uzbek       |
+| `gu` | Gujarati    | `hi` | Hindi      | `vi` | Vietnamese  |
+| `he` | Hebrew      | `zh` | Chinese    | `zu` | Zulu        |
+
+<Warning>
+  Passing an unsupported language code returns a `422` validation error.
+</Warning>
+
+## Behavior Details
+
+| Scenario                       | Behavior                                                                          |
+| ------------------------------ | --------------------------------------------------------------------------------- |
+| `language` not passed          | English (default) — no changes to current behavior                                |
+| `language="en"`                | English — no translation or prompt injection                                      |
+| `language="es"`                | Welcome message translated to Spanish, AI responds in Spanish                     |
+| Unsupported language code      | `422` error returned by the API                                                   |
+| Welcome message is `null`      | The SDK default ("Hi! How can I help you today?") is translated                   |
+| Translation fails              | Falls back to the original English text silently                                  |
+
+## Troubleshooting
+
+| Issue                          | Solution                                                                                       |
+| ------------------------------ | ---------------------------------------------------------------------------------------------- |
+| `422` error on chat            | Check the language code is a valid ISO 639-1 code from the table above                        |
+| Welcome message still in English | Verify `data-language` / `language` prop is set and not `"en"`                              |
+| AI responds in wrong language  | Check the language code is correct — `zh` for Chinese, `pt` for Portuguese, etc.              |
+| Mixed languages in response    | This can happen if the user writes in a different language. The AI prioritizes the configured language but may adapt to user input |

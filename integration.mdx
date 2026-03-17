@@ -1,0 +1,49 @@
+---
+title: "Integration"
+description: "Connect your agent to APIs and services"
+---
+
+Integrations let your agent take actions — not just answer questions.
+
+## Options
+
+| Type        | Best for                                    | Setup              |
+| ----------- | ------------------------------------------- | ------------------ |
+| **OpenAPI** | Your REST API                               | Upload spec file   |
+| **MCP**     | Third-party services, complex integrations  | Connect server URL |
+
+## When to Use OpenAPI
+
+- You have a REST API with an OpenAPI/Swagger spec
+- You want your agent to call your backend (check orders, create tickets, etc.)
+- You need to authenticate requests with API keys or user tokens
+
+## When to Use MCP
+
+- Connecting third-party services
+- Using pre-built integrations (Notion, etc.)
+- Real-time bidirectional communication
+
+## Example Actions
+
+### OpenAPI
+
+- Check order status
+- Create support tickets
+- Look up customer info
+- Process refunds
+
+### MCP
+
+- Search Notion pages
+- Query databases
+- Access Google Drive
+
+<CardGroup cols={2}>
+  <Card title="OpenAPI" icon="plug" href="/openapi">
+    Connect your REST API
+  </Card>
+  <Card title="MCP Servers" icon="server" href="/mcp-servers">
+    Connect MCP servers
+  </Card>
+</CardGroup>

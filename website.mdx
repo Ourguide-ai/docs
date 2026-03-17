@@ -1,0 +1,62 @@
+---
+title: "Website"
+description: "Crawl and index your website"
+---
+
+Automatically crawl your website so your agent can reference its content.
+
+## Setup
+
+1. Enter your website URL (e.g., `https://docs.yourcompany.com`)
+2. Click **Ingest**
+3. Ourguide crawls linked pages on the same domain
+
+## What Gets Crawled
+
+### Included
+
+- Publicly accessible pages
+- Pages linked from starting URL
+- Same domain only
+- Protected/authenticated pages (via embedded browser login)
+
+### Not Included
+
+- Pages blocked by `robots.txt`
+- External domains
+- JavaScript-rendered content
+
+## Crawling Protected Pages
+
+If your docs or website requires a login, Ourguide includes an **embedded browser** in the dashboard so you can authenticate before crawling.
+
+### How it works
+
+1. Go to **Knowledge Base → Website**
+2. An embedded browser loads your URL
+3. Log in to your website inside that browser as you normally would
+4. Once logged in, click **Start Crawling**
+
+The crawler runs in the context of that authenticated session, so it can access the same pages your logged-in users see.
+
+<Info>
+  You don't need to copy cookies or configure any headers — just log in and crawl.
+</Info>
+
+## Re-indexing
+
+When content changes:
+
+1. Go to [Knowledge Base](https://dashboard.ourguide.ai/dashboard/sources/files)
+2. Enter URL again
+3. Click **Ingest**
+
+<Info>
+  Re-indexing replaces previous content.
+</Info>
+
+## Tips
+
+- Use your **docs subdomain** for focused content (`docs.yourcompany.com`)
+- **Re-index** after major content updates
+- **Test in Sandbox** to verify content is accessible

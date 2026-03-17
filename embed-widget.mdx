@@ -1,0 +1,373 @@
+---
+title: "Embed Widget"
+description: "Add the Ourguide widget to your website"
+sidebarTitle: "Embed Widget"
+---
+
+## Installation
+
+Choose your preferred installation method:
+
+<CodeGroup>
+
+```html Script Tag
+<script
+  src="https://api.ourguide.ai/static/ourguide-widget.js"
+  data-api-url="https://api.ourguide.ai"
+  data-product-id="YOUR_PRODUCT_ID"
+  data-agent-name="Your Agent Name"
+></script>
+```
+
+```jsx React SDK
+import { OurguideWidget } from "@ourguide/react";
+
+export default function App() {
+  return (
+    <OurguideWidget
+      apiUrl="https://api.ourguide.ai"
+      productId="YOUR_PRODUCT_ID"
+      agentName="Your Agent Name"
+    />
+  );
+}
+```
+
+</CodeGroup>
+
+### Script Tag Attributes
+
+| Attribute          | Required | Description                              |
+| ------------------ | -------- | ---------------------------------------- |
+| `data-api-url`     | Yes      | `https://api.ourguide.ai`               |
+| `data-product-id`  | Yes      | Your product ID from dashboard           |
+| `data-agent-name`  | No       | Display name (defaults to "Assistant")   |
+| `data-variant`     | No       | `widget` (default) or `copilot`          |
+
+### Find Your Product ID
+
+1. Go to [dashboard.ourguide.ai/deploy](https://dashboard.ourguide.ai/deploy)
+2. Copy your Product ID
+
+---
+
+## JavaScript API
+
+After the script loads, use `window.ourguide()` to pass functions and objects:
+
+| Command                    | Description                                              |
+| -------------------------- | -------------------------------------------------------- |
+| `setIdentityTokenFetcher`  | Auto-refreshing JWT function. See [Identity](#user-identity) |
+| `setContext`               | Page context object. See [Context](#page-context)        |
+| `onToolResult`             | Callback on tool completion. See [Callbacks](#tool-result-callbacks) |
+| `registerToolRenderers`    | Custom inline visuals. See [Renderers](#tool-renderers)  |
+| `identify`                 | Manual JWT token (alternative to fetcher)                |
+| `registerTools`            | Client-side tool handlers                                |
+| `open`                     | Programmatically open/expand the widget or copilot       |
+| `close`                    | Programmatically close/collapse the widget or copilot    |
+
+---
+
+## User Identity
+
+Authenticate users for persistent conversations and user-specific actions.
+
+### Option A — Auto-refresh (recommended)
+
+Pass a function that fetches a JWT. The SDK calls it on mount and re-calls it automatically when the token expires (401):
+
+<CodeGroup>
+
+```javascript Script Tag
+window.ourguide('setIdentityTokenFetcher', async () => {
+  const res = await fetch('/api/ourguide-token');
+  const { token } = await res.json();
+  return token;
+});
+```
+
+```jsx React SDK
+<OurguideWidget
+  apiUrl="https://api.ourguide.ai"
+  productId="YOUR_PRODUCT_ID"
+  identityTokenFetcher={async () => {
+    const res = await fetch('/api/ourguide-token');
+    const { token } = await res.json();
+    return token;
+  }}
+/>
+```
+
+</CodeGroup>
+
+### Option B — Manual
+
+Pass a static token (you handle refresh yourself):
+
+<CodeGroup>
+
+```javascript Script Tag
+window.ourguide('identify', {
+  token: 'jwt-from-your-backend',
+  name: 'John Doe'
+});
+
+// On logout
+window.ourguide('resetUser');
+```
+
+```jsx React SDK
+<OurguideWidget
+  apiUrl="https://api.ourguide.ai"
+  productId="YOUR_PRODUCT_ID"
+  identity={{ token: 'jwt-from-your-backend', name: 'John Doe' }}
+/>
+```
+
+</CodeGroup>
+
+See [Identity Verification](/identity-verification) for backend JWT setup.
+
+---
+
+## Client-Side Tools
+
+Register tools the agent can call. The return value from your handler is sent back to the agent, so it can confirm success or handle errors intelligently.
+
+<CodeGroup>
+
+```javascript Script Tag
+window.ourguide('registerTools', {
+  navigateToPage: async ({ path }) => {
+    router.push(path);
+    return { success: true };
+  },
+  showUpgradeModal: async () => {
+    document.getElementById('upgrade-modal').showModal();
+    return { shown: true };
+  }
+});
+```
+
+```jsx React SDK
+<OurguideWidget
+  apiUrl="https://api.ourguide.ai"
+  productId="YOUR_PRODUCT_ID"
+  tools={{
+    navigateToPage: async ({ path }) => {
+      router.push(path);
+      return { success: true };
+    },
+    showUpgradeModal: async () => {
+      document.getElementById('upgrade-modal').showModal();
+      return { shown: true };
+    }
+  }}
+/>
+```
+
+</CodeGroup>
+
+<Tip>
+  Return meaningful results from your tools. The agent uses these to provide accurate feedback like "Done! I've navigated you to Settings" or handle errors gracefully.
+</Tip>
+
+---
+
+## Page Context
+
+Give the AI context about the current page so it can perform page-aware actions.
+
+<CodeGroup>
+
+```javascript Script Tag
+window.ourguide('setContext', { itemId: 'abc-123', page: 'settings' });
+
+// Update on navigation:
+window.addEventListener('popstate', () => {
+  window.ourguide('setContext', { page: location.pathname });
+});
+```
+
+```jsx React SDK
+<OurguideWidget
+  apiUrl="https://api.ourguide.ai"
+  productId="YOUR_PRODUCT_ID"
+  context={{ itemId: 'abc-123', page: 'settings' }}
+/>
+```
+
+</CodeGroup>
+
+---
+
+## Tool Result Callbacks
+
+React to server-side tool completions — refresh data, show a diff UI, dispatch events, etc.
+
+<CodeGroup>
+
+```javascript Script Tag
+window.ourguide('onToolResult', (toolName, result) => {
+  if (toolName === 'propose_revision') {
+    showDiffUI(result);
+  }
+});
+```
+
+```jsx React SDK
+<OurguideWidget
+  apiUrl="https://api.ourguide.ai"
+  productId="YOUR_PRODUCT_ID"
+  onToolResult={(toolName, result) => {
+    if (toolName === 'propose_revision') {
+      showDiffUI(result);
+    }
+  }}
+/>
+```
+
+</CodeGroup>
+
+---
+
+## Tool Renderers
+
+Render custom visuals inline in the chat when a tool completes — data cards, tables, charts, and more.
+
+Your renderer receives `{ result, status }` and returns one of:
+
+| Return type   | Use case                                  |
+| ------------- | ----------------------------------------- |
+| HTML string   | Data cards, tables, simple visuals        |
+| HTMLElement   | Charts via Chart.js, D3, ECharts, Plotly  |
+| ReactNode     | Full React components (React SDK only)    |
+
+### Data Card
+
+Show key metrics with change indicators:
+
+```javascript
+window.ourguide('registerToolRenderers', {
+  query_analytics_chart: ({ result }) => {
+    const r = result || {};
+    const color = r.changePercent > 0 ? '#059669' : '#ef4444';
+    const arrow = r.changePercent > 0 ? '↑' : '↓';
+    return `<div style="padding:12px; border:1px solid #e2e8f0; border-radius:8px;">
+      <div style="font-size:13px; font-weight:600;">${r.title}</div>
+      <div style="font-size:24px; font-weight:700; color:#2563eb;">${r.value}</div>
+      ${r.changePercent != null
+        ? `<div style="font-size:12px; color:${color};">${arrow} ${Math.abs(r.changePercent)}%</div>`
+        : ''}
+    </div>`;
+  }
+});
+```
+
+### Table
+
+Display structured data in rows and columns:
+
+```javascript
+window.ourguide('registerToolRenderers', {
+  query_data_table: ({ result }) => {
+    const r = result || {};
+    const headers = r.columns || [];
+    const rows = r.rows || [];
+    return `<div style="border:1px solid #e2e8f0; border-radius:8px; overflow:hidden;">
+      <table style="width:100%; border-collapse:collapse; font-size:12px;">
+        <thead>
+          <tr style="background:#f8fafc;">
+            ${headers.map(h =>
+              '<th style="padding:8px 12px; text-align:left; font-weight:600;">' + h + '</th>'
+            ).join('')}
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(row =>
+            '<tr style="border-bottom:1px solid #f1f5f9;">' +
+            row.map(cell =>
+              '<td style="padding:6px 12px; color:#334155;">' + cell + '</td>'
+            ).join('') +
+            '</tr>'
+          ).join('')}
+        </tbody>
+      </table>
+    </div>`;
+  }
+});
+```
+
+### Chart (Chart.js, D3, ECharts)
+
+For interactive charts, return an HTMLElement instead of a string. The widget mounts it directly:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+window.ourguide('registerToolRenderers', {
+  query_analytics_chart: ({ result }) => {
+    const canvas = document.createElement('canvas');
+    canvas.style.width = '100%';
+    canvas.style.maxHeight = '200px';
+    new Chart(canvas, {
+      type: 'line',
+      data: {
+        labels: result.data.map(d => d.date),
+        datasets: [{
+          label: result.title,
+          data: result.data.map(d => d.value),
+          borderColor: '#2563eb',
+          tension: 0.3,
+        }]
+      },
+      options: { responsive: true, plugins: { legend: { display: false } } }
+    });
+    return canvas;
+  }
+});
+</script>
+```
+
+### Next.js Timing
+
+In Next.js, use `onLoad` to ensure the script has loaded before calling `window.ourguide()`:
+
+```jsx
+<Script
+  src="https://api.ourguide.ai/static/ourguide-widget.js"
+  data-product-id="YOUR_PRODUCT_ID"
+  data-api-url="https://api.ourguide.ai"
+  strategy="afterInteractive"
+  onLoad={() => {
+    window.ourguide('registerToolRenderers', { ... });
+  }}
+/>
+```
+
+<Warning>
+  The widget uses Shadow DOM for CSS isolation. Use inline style attributes — Tailwind classes and external CSS won't apply inside the widget.
+</Warning>
+
+---
+
+## Programmatic Open / Close
+
+Open or close the widget from your own code — useful for onboarding flows, feature tours, or reacting to in-app events.
+
+```javascript
+window.ourguide('open');  // expand the widget / sidebar
+window.ourguide('close'); // collapse it
+```
+
+Works with both the floating widget and the copilot sidebar. `window.ourguide('open')` works from anywhere — event handlers, `useEffect`, timeouts, or third-party callbacks. No imports needed.
+
+---
+
+## Troubleshooting
+
+| Issue               | Solution                                                |
+| ------------------- | ------------------------------------------------------- |
+| Widget not appearing | Check Product ID, verify script/component is rendered  |
+| Console errors      | Check `apiUrl` is correct                               |
+| CORS errors         | Contact support to whitelist your domain                |

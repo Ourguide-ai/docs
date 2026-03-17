@@ -1,0 +1,179 @@
+---
+title: "Identity Verification"
+description: "Authenticate users in your widget"
+---
+
+Identity verification lets your agent know who the user is — enabling personalized support and persistent conversations.
+
+## What You Get
+
+| Feature                | Anonymous | Verified |
+| ---------------------- | --------- | -------- |
+| Chat                   | Yes       | Yes      |
+| Conversation history   | No        | Yes      |
+| Personalized by name   | No        | Yes      |
+| User-specific actions  | No        | Yes      |
+
+## How It Works
+
+1. User logs into **your** app
+2. Your backend mints an Ourguide identity token (JWT signed with your Ourguide secret)
+3. Your frontend calls `window.ourguide('identify', { token })`
+4. Widget now knows who the user is
+
+<Info>
+  This is not your app's session JWT. It's a separate Ourguide-scoped identity token that your backend mints specifically for Ourguide. Your app JWT stays private.
+</Info>
+
+---
+
+## 1. Get Your Secret
+
+Go to [dashboard.ourguide.ai/deploy](https://dashboard.ourguide.ai/deploy) → copy **Verification Secret**.
+
+Add to your backend environment:
+
+```bash
+OURGUIDE_VERIFICATION_SECRET=your_secret_here
+```
+
+<Warning>
+  Never expose this secret in frontend code.
+</Warning>
+
+## 2. Create Backend Endpoint
+
+<CodeGroup>
+
+```javascript Node.js (Express)
+const jwt = require('jsonwebtoken');
+
+app.get('/api/ourguide-token', authMiddleware, (req, res) => {
+  const token = jwt.sign(
+    {
+      user_id: String(req.user.id),
+      exp: Math.floor(Date.now() / 1000) + 3600,
+      email: req.user.email,
+      name: req.user.name,
+    },
+    process.env.OURGUIDE_VERIFICATION_SECRET,
+    { algorithm: 'HS256' }
+  );
+  res.json({ token });
+});
+```
+
+```python Python (FastAPI)
+import jwt
+import time
+from fastapi import Request
+
+@app.get("/api/ourguide-token")
+async def ourguide_token(request: Request):
+    user = request.state.user
+    token = jwt.encode(
+        {
+            "user_id": str(user.id),
+            "exp": int(time.time()) + 3600,
+            "email": user.email,
+            "name": user.name,
+        },
+        os.environ["OURGUIDE_VERIFICATION_SECRET"],
+        algorithm="HS256",
+    )
+    return {"token": token}
+```
+
+```python Python (Flask)
+import jwt
+import time
+
+@app.route("/api/ourguide-token")
+@login_required
+def ourguide_token():
+    token = jwt.encode(
+        {
+            "user_id": str(current_user.id),
+            "exp": int(time.time()) + 3600,
+            "email": current_user.email,
+            "name": current_user.name,
+        },
+        os.environ["OURGUIDE_VERIFICATION_SECRET"],
+        algorithm="HS256",
+    )
+    return {"token": token}
+```
+
+</CodeGroup>
+
+### JWT Payload
+
+| Field     | Type   | Required | Description             |
+| --------- | ------ | -------- | ----------------------- |
+| `user_id` | string | Yes      | Unique user identifier  |
+| `exp`     | number | Yes      | Expiration (Unix timestamp) |
+| `email`   | string | No       | User's email            |
+| `name`    | string | No       | Display name            |
+
+## 3. Identify in Frontend
+
+<CodeGroup>
+
+```jsx React SDK (Recommended)
+import { OurguideWidget } from "@ourguide/react";
+
+function App() {
+  return (
+    <OurguideWidget
+      productId="YOUR_PRODUCT_ID"
+      apiUrl="https://api.ourguide.ai"
+      getIdentityToken={async () => {
+        const res = await fetch('/api/ourguide-token');
+        const { token } = await res.json();
+        return token;
+      }}
+    />
+  );
+}
+```
+
+```javascript Script Tag
+window.ourguide('setIdentityTokenFetcher', async () => {
+  const res = await fetch('/api/ourguide-token');
+  const { token } = await res.json();
+  return token;
+});
+```
+
+</CodeGroup>
+
+With the React SDK, pass `getIdentityToken` to the widget component. The SDK calls it on mount and auto-refreshes when the token expires — no manual polling needed.
+
+<Tip>
+  That's it. No `useEffect`, no `setInterval`, no `window.ourguide('identify')` calls.
+</Tip>
+
+## 4. Handle Logout
+
+<CodeGroup>
+
+```jsx React SDK
+// Logout is handled automatically — when the component unmounts
+// or the user navigates away, the session is cleared.
+```
+
+```javascript Script Tag
+window.ourguide('resetUser');
+```
+
+</CodeGroup>
+
+---
+
+## Troubleshooting
+
+| Issue                  | Solution                                                    |
+| ---------------------- | ----------------------------------------------------------- |
+| User not identified    | Check secret matches dashboard, `user_id` is a string      |
+| Token invalid          | Check `exp` is in the future, algorithm is `HS256`          |
+| History not persisting | Call `identify()` on page load, not just after login        |

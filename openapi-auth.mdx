@@ -1,0 +1,169 @@
+---
+title: "OpenAPI Authentication"
+description: "Configure API authentication for your agent"
+---
+
+How Ourguide authenticates when calling your API.
+
+## Auth Types
+
+| Type             | Use Case                  | Header Sent                          |
+| ---------------- | ------------------------- | ------------------------------------ |
+| **API Key**      | Static server-to-server auth | `X-API-Key: your-key`             |
+| **Bearer Token** | OAuth/static token        | `Authorization: Bearer token`        |
+| **JWT Forward**  | Per-user actions          | `Authorization: Bearer <user-jwt>`   |
+
+---
+
+## API Key
+
+Your agent sends a static key in a custom header.
+
+**OpenAPI spec:**
+
+```yaml
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+security:
+  - ApiKeyAuth: []
+```
+
+**Dashboard config:**
+
+1. Select **API Key**
+2. Enter header name (`X-API-Key`)
+3. Enter your key
+
+---
+
+## Bearer Token
+
+Your agent sends a static token in the Authorization header.
+
+**OpenAPI spec:**
+
+```yaml
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+security:
+  - BearerAuth: []
+```
+
+**Dashboard config:**
+
+1. Select **Bearer Token**
+2. Enter your token
+
+---
+
+## JWT Forward
+
+Your agent forwards the user's Ourguide identity token to your API. This enables user-specific actions like "check my orders" or "cancel my subscription."
+
+<Info>
+  This is not your app's session JWT. It's an Ourguide-scoped identity token your backend mints with `OURGUIDE_VERIFICATION_SECRET`. See [Identity Verification](/identity-verification).
+</Info>
+
+### How it works
+
+1. Your backend mints an Ourguide identity token (JWT signed with Ourguide secret)
+2. Frontend passes it to widget: `window.ourguide('identify', { token })`
+3. When calling your API, Ourguide forwards that same token
+4. Your API verifies it (same secret) and identifies the user
+
+**OpenAPI spec:**
+
+```yaml
+components:
+  securitySchemes:
+    UserJWT:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - UserJWT: []
+paths:
+  /my/orders:
+    get:
+      operationId: getMyOrders
+      summary: Get user's orders
+```
+
+**Dashboard config:**
+
+1. Select **JWT Forward**
+2. No additional config — token comes from widget user
+
+### Your API must verify the token
+
+<CodeGroup>
+
+```javascript Node.js
+const jwt = require('jsonwebtoken');
+
+function authMiddleware(req, res, next) {
+  const token = req.headers.authorization?.split(' ')[1];
+  try {
+    const payload = jwt.verify(token, process.env.OURGUIDE_VERIFICATION_SECRET);
+    req.user = { id: payload.user_id, email: payload.email };
+    next();
+  } catch {
+    res.status(401).json({ error: 'Invalid token' });
+  }
+}
+
+app.get('/my/orders', authMiddleware, async (req, res) => {
+  const orders = await db.orders.findMany({ where: { userId: req.user.id } });
+  res.json(orders);
+});
+```
+
+```python Python
+import jwt
+from functools import wraps
+
+def auth_required(f):
+    @wraps(f)
+    async def decorated(request, *args, **kwargs):
+        token = request.headers.get("Authorization", "").split(" ")[1]
+        try:
+            payload = jwt.decode(token, os.environ["OURGUIDE_VERIFICATION_SECRET"], algorithms=["HS256"])
+            request.state.user = {"id": payload["user_id"], "email": payload.get("email")}
+        except jwt.InvalidTokenError:
+            return JSONResponse({"error": "Invalid token"}, status_code=401)
+        return await f(request, *args, **kwargs)
+    return decorated
+```
+
+</CodeGroup>
+
+<Warning>
+  JWT Forward only works for authenticated widget users. Anonymous users won't have a token to forward.
+</Warning>
+
+---
+
+## Which to Use?
+
+| Scenario                                         | Auth Type          |
+| ------------------------------------------------ | ------------------ |
+| All requests use same credentials                | API Key or Bearer  |
+| User-specific actions (my orders, my account)    | JWT Forward        |
+| Public API, no auth needed                       | None               |
+
+---
+
+## Troubleshooting
+
+| Issue                              | Solution                                              |
+| ---------------------------------- | ----------------------------------------------------- |
+| 401 errors                         | Check secret matches, verify token not expired        |
+| Tools not showing for users        | JWT Forward requires authenticated users              |
+| Double path prefix (`/api/api/`)   | Put prefix in Base URL OR paths, not both             |
