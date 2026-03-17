@@ -30,70 +30,73 @@
         "groups": [
           {
             "group": "Get Started",
-            "pages": ["introduction", "quickstart", "ourguide-docs-mcp"]
+            "pages": [
+              "get-started/introduction",
+              "get-started/quickstart",
+              "get-started/ourguide-docs-mcp"
+            ]
           },
           {
             "group": "Setup",
             "pages": [
-             "embed-widget",
-             "react-native",
-             "flutter",
-             "multi-language-support",
-             "customization",
-             "identity-verification",
-             "event-callbacks",
-             "deploy"
+              "setup/embed-widget",
+              "setup/react-native",
+              "setup/flutter",
+              "setup/multi-language-support",
+              "setup/customization",
+              "setup/identity-verification",
+              "setup/event-callbacks",
+              "setup/deploy"
             ]
           },
           {
             "group": "Agent",
             "pages": [
-              "sandbox",
-              "actions",
-              "user-suggestions",
-              "workflows",
-              "page-navigation"
+              "agent/sandbox",
+              "agent/actions",
+              "agent/user-suggestions",
+              "agent/workflows",
+              "agent/page-navigation"
             ]
           },
           {
             "group": "Knowledge Base",
             "pages": [
-              "knowledge-base",
-              "files",
-              "website",
-              "notion"
+              "knowledge-base/knowledge-base",
+              "knowledge-base/files",
+              "knowledge-base/website",
+              "knowledge-base/notion"
             ]
           },
           {
             "group": "Integration",
             "pages": [
-              "integration",
-              "api-integration",
-              "envoy-cli",
+              "integration/integration",
+              "integration/api-integration",
+              "integration/envoy-cli",
               {
                 "group": "Server-Side Tools",
                 "pages": [
-                  "openapi",
-                  "openapi-auth",
-                  "mcp-servers",
-                  "server-side-mcp-auth"
+                  "integration/openapi",
+                  "integration/openapi-auth",
+                  "integration/mcp-servers",
+                  "integration/server-side-mcp-auth"
                 ]
               },
-              "multi-subdomain-endpoints",
-              "client-side-tools",
-              "tool-renderers",
-              "external-mcp-servers"
+              "integration/multi-subdomain-endpoints",
+              "integration/client-side-tools",
+              "integration/tool-renderers",
+              "integration/external-mcp-servers"
             ]
           },
           {
             "group": "Monitor",
             "pages": [
-              "activity"
+              "monitor/activity"
             ]
           }
         ]
       }
-
     ]
   },
   "footerSocials": {
