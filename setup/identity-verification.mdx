@@ -120,13 +120,13 @@ def ourguide_token():
 <CodeGroup>
 
 ```jsx React SDK (Recommended)
-import { OurguideWidget } from "@ourguide/react";
+import { OurguideWidget } from "@ourguide-ai/ui";
 
 function App() {
   return (
     <OurguideWidget
       productId="YOUR_PRODUCT_ID"
-      apiUrl="https://api.ourguide.ai"
+      apiUrl="https://dashboard.ourguide.ai"
       getIdentityToken={async () => {
         const res = await fetch('/api/ourguide-token');
         const { token } = await res.json();

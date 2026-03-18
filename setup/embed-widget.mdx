@@ -418,23 +418,6 @@ Your renderer receives `{ result, status }` and returns one of:
 
 ---
 
-## Programmatic Open / Close
-
-Open or close the widget from your own code — useful for onboarding flows, feature tours, or reacting to in-app events.
-
-```javascript
-window.ourguide('open');   // expand the widget / sidebar
-window.ourguide('close');  // collapse it
-```
-
-Works with both the floating widget and the copilot sidebar.
-
-<Tip>
-  `window.ourguide('open')` works from anywhere — event handlers, `useEffect`, timeouts, or third-party callbacks. No imports needed.
-</Tip>
-
----
-
 ## Quick Q&A
 
 Some users find it more intuitive to read setup instructions in Q&A format. Here's everything above as quick answers:
