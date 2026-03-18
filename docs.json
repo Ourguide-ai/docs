@@ -40,7 +40,6 @@
             "pages": [
               "setup/embed-widget",
               "setup/identity-verification",
-              "setup/event-callbacks",
               "setup/deploy"
             ]
           },

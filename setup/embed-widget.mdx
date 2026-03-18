@@ -98,32 +98,25 @@ Choose your preferred installation method:
     | `navigate`         | No       | SPA navigation function (e.g. `router.push`) for internal links                                                  |
 
     <Accordion title="Copilot Sidebar">
-      The SDK also includes a sidebar component — no provider wrapping needed:
+      A full-height sidebar that automatically pushes your page content aside. Wrap your app with `OurguideProvider` and place `OurguideCopilot` alongside your app:
+
+      ```bash
+      npm install @ourguide/client @ourguide/ui
+      ```
 
       ```tsx
-
-      import { OurguideCopilot } from '@ourguide-ai/ui';
+      import { OurguideProvider, OurguideCopilot } from '@ourguide/ui';
       import '@ourguide-ai/ui/styles.css';
 
-      export function App() {
+      function App() {
         return (
-          <>
+          <OurguideProvider
+            productId="YOUR_PRODUCT_ID"
+            apiUrl="https://dashboard.ourguide.in"
+          >
             <YourApp />
-            <OurguideCopilot
-              productId="YOUR_PRODUCT_ID"
-              apiUrl="https://api.ourguide.ai"
-              variant="floating"
-              position="right"
-              width={400}
-              getIdentityToken={async () => {
-                const res = await fetch('/api/ourguide-token');
-                const { token } = await res.json();
-                return token;
-              }}
-              context={{ pageId: 'current-page-id' }}
-              navigate={(path) => router.push(path)}
-            />
-          </>
+            <OurguideCopilot position="right" width={400} />
+          </OurguideProvider>
         );
       }
       ```
@@ -133,7 +126,7 @@ Choose your preferred installation method:
 
 ## Find Your Product ID
 
-1. Go to [dashboard.ourguide.ai/deploy](https://dashboard.ourguide.ai/dashboard/deploy)
+1. Go to [dashboard.ourguide.ai/dashboard/deploy/widget](https://dashboard.ourguide.ai/dashboard/deploy/widget)
 2. Copy your Product ID
 
 ---
@@ -413,7 +406,7 @@ Your renderer receives `{ result, status }` and returns one of:
     React SDK renderers return **JSX** — full React components with hooks, state, and libraries like Recharts:
 
     ```tsx
-    <OurguideCopilot
+    <OurguideWidget
       toolRenderers={{
         query_analytics_chart: ({ result }) => <MyChart data={result.data} />,
       }}
@@ -455,7 +448,7 @@ Some users find it more intuitive to read setup instructions in Q&A format. Here
     ```
 
     ```tsx
-    <OurguideCopilot
+    <OurguideWidget
       productId="YOUR_PRODUCT_ID"
       apiUrl="https://dashboard.ourguide.ai"
     />
@@ -472,7 +465,7 @@ Some users find it more intuitive to read setup instructions in Q&A format. Here
     2. **Pass it as a prop:**
 
     ```tsx
-    <OurguideCopilot
+    <OurguideWidget
       productId="YOUR_PRODUCT_ID"
       apiUrl="https://dashboard.ourguide.ai"
       getIdentityToken={async () => {
@@ -499,7 +492,7 @@ Some users find it more intuitive to read setup instructions in Q&A format. Here
       return match ? { itemId: match[1] } : {};
     }, [pathname]);
 
-    <OurguideCopilot
+    <OurguideWidget
       ...
       context={context}
     />
@@ -512,7 +505,7 @@ Some users find it more intuitive to read setup instructions in Q&A format. Here
     Pass your router's push function:
 
     ```tsx
-    <OurguideCopilot
+    <OurguideWidget
       ...
       navigate={(path) => router.push(path)}
     />
@@ -525,7 +518,7 @@ Some users find it more intuitive to read setup instructions in Q&A format. Here
     **React SDK** — use `onToolResult` and `toolRenderers` as props:
 
     ```tsx
-    <OurguideCopilot
+    <OurguideWidget
       onToolResult={(toolName, result) => {
         if (toolName === 'propose_revision') showDiffUI(result);
       }}
@@ -552,16 +545,14 @@ Some users find it more intuitive to read setup instructions in Q&A format. Here
     Everything is a prop on one component:
 
     ```tsx
-    <OurguideCopilot
+    <OurguideWidget
       productId="..."
       apiUrl="https://dashboard.ourguide.ai"
       getIdentityToken={fetchToken}
-      context={{ itemId: "abc-123" }}
       navigate={(path) => router.push(path)}
       onToolResult={(name, result) => ...}
       toolRenderers={{ ... }}
-      variant="floating"
-      position="right"
+
     />
     ```
 

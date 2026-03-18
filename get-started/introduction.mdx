@@ -14,39 +14,36 @@ Ourguide is an embeddable AI agent that answers questions, takes actions, and kn
   <Card title="Identity Verification" icon="shield-halved" href="/setup/identity-verification">
     Authenticate your users
   </Card>
-  <Card title="Ourguide Docs MCP" icon="robot" href="/get-started/ourguide-docs-mcp">
-    AI-assisted integration
-  </Card>
 </CardGroup>
 
 ## Installation
 
 Add the Ourguide widget to your site with a single script tag:
 
-<CodeGroup>
+<Tabs>
+  <Tab title="Script Tag">
+    ```html
+    <script
+      src="https://dashboard.ourguide.ai/ourguide-b2b-widget.iife.js"
+      data-api-url="https://dashboard.ourguide.ai"
+      data-product-id="YOUR_PRODUCT_ID"
+    ></script>
+    ```
+  </Tab>
 
-```html Script Tag
-<script
-  src="https://dashboard.ourguide.ai/ourguide-b2b-widget.iife.js"
-  data-api-url="https://dashboard.ourguide.ai"
-  data-product-id="YOUR_PRODUCT_ID"
-></script>
-```
+  <Tab title="React SDK">
+    ```bash
+    npm install @ourguide-ai/client @ourguide-ai/ui
+    ```
 
-```jsx React SDK
-import { OurguideWidget } from "@ourguide/react";
+    ```tsx
+    import { OurguideWidget } from '@ourguide-ai/ui';
+    import '@ourguide-ai/ui/styles.css';
 
-export default function App() {
-  return (
-    <OurguideWidget
-      apiUrl="https://api.ourguide.ai"
-      productId="YOUR_PRODUCT_ID"
-    />
-  );
-}
-```
-
-</CodeGroup>
+    <OurguideWidget productId="YOUR_PRODUCT_ID" apiUrl="https://dashboard.ourguide.ai" />
+    ```
+  </Tab>
+</Tabs>
 
 ## Core Features
 
@@ -63,7 +60,7 @@ export default function App() {
     Add the script tag to your site.
   </Step>
   <Step title="Integrate">
-    Connect your API via [OpenAPI spec](/integration/openapi) or [MCP](/integration/mcp-servers).
+    Connect your API via [OpenAPI spec](/integration/openapi).
   </Step>
   <Step title="Deploy">
     Monitor conversations in [Activity](/monitor/activity).
