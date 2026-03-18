@@ -1,92 +1,77 @@
 ---
 title: "User Suggestions"
-description: "Show quick action buttons in the chat widget"
+description: "Show quick-action chips in the chat widget"
 ---
 
-User suggestions are clickable buttons that appear above the chat input, giving users one-tap access to common actions.
+User suggestions are clickable chips that appear in the chat widget before the user types anything. They give users one-tap access to common questions and actions — no typing required.
 
-## Two Types
+## Setup
 
-| Type             | Set By                              | Persists                                        |
-| ---------------- | ----------------------------------- | ----------------------------------------------- |
-| Page-level       | Host app via `window.ourguide()`    | Yes — reappears after each response             |
-| Agent-driven     | Agent via `suggest_actions` tool    | No — clears when user sends a message           |
+<Steps>
+  <Step title="Open the dashboard">
+    Go to [Agent → Suggestions](https://dashboard.ourguide.ai/agent/suggestions).
+  </Step>
+  <Step title="Add suggestions">
+    Click **Add Suggestion** and fill in:
 
-## Page-Level Suggestions
+    | Field            | Description                                                              |
+    | ---------------- | ------------------------------------------------------------------------ |
+    | **Button label** | Text shown on the chip (e.g., "Track my order")                          |
+    | **Message**      | Text sent to the agent when clicked. Defaults to the label if left empty |
+  </Step>
+  <Step title="Save and preview">
+    Click **Save Changes**. The live preview on the right shows exactly how the chips will appear in your widget.
+  </Step>
+</Steps>
 
-Use `window.ourguide('setSuggestedActions', [...])` to set persistent buttons for the current page. These reappear after every agent response.
+---
 
-Each suggestion has:
-- `label` — Button text shown to the user
-- `message` — Text sent to the agent when clicked
+## How It Works
 
-```js
-// Show different buttons per page
-window.ourguide('setSuggestedActions', [
-  { label: 'Enrich contacts', message: 'Enrich owner contacts for these leads' },
-  { label: 'Export', message: 'Export this list to CSV' },
-]);
+1. You configure suggestion chips in the dashboard
+2. The widget loads and displays them as clickable buttons above the input
+3. When a user clicks a chip, the **message** is sent to the agent as if the user typed it
+4. If the message field is empty, the **label** text is sent instead
 
-// Clear suggestions
-window.ourguide('setSuggestedActions', []);
-```
+---
 
-### Per-Page Example (Next.js)
-
-```jsx
-import { useRouter } from 'next/router';
-import { useEffect } from 'react';
-
-function OurguideSetup() {
-  const router = useRouter();
-
-  useEffect(() => {
-    const setSuggestions = () => {
-      if (!window.ourguide) {
-        setTimeout(setSuggestions, 200);
-        return;
-      }
-
-      if (router.pathname === '/leads') {
-        window.ourguide('setSuggestedActions', [
-          { label: 'Enrich contacts', message: 'Enrich owner contacts' },
-          { label: 'Add to list', message: 'Add these results to a new list' },
-        ]);
-      } else if (router.pathname.startsWith('/myList')) {
-        window.ourguide('setSuggestedActions', [
-          { label: 'Export', message: 'Export this list to CSV' },
-        ]);
-      }
-    };
-
-    setSuggestions();
-  }, [router.pathname]);
-
-  return null;
-}
-```
-
-## Agent-Driven Suggestions
-
-The agent can show buttons on demand by calling the `suggest_actions` tool. Add instructions to your agent's system prompt telling it when to offer buttons:
-
-```
-Before running any enrichment, confirm the cost with suggest_actions buttons:
-- "Yes, proceed (3 credits)"
-- "Cancel"
-```
-
-The agent calls `suggest_actions` with an array of `{ label, message }` objects. These buttons clear automatically when the user sends their next message.
-
-## Dashboard Config
-
-You can also set initial suggestions (shown before the user types anything) from the dashboard under **Agent → Suggestions**. These are stored in your product config and appear on widget load.
+## Best Practices
 
 <CardGroup cols={2}>
-  <Card title="Actions" icon="bolt" href="/actions">
+  <Card title="Keep labels short" icon="text-size">
+    2–4 words work best so chips don't wrap on mobile (e.g., "Track order" instead of "I want to track my order status")
+  </Card>
+  <Card title="Use specific messages" icon="message">
+    The label is what users see; the message is what the agent receives. Use the message field for detailed prompts the agent can act on
+  </Card>
+  <Card title="Cover common questions" icon="circle-question">
+    Look at your most frequent conversations in [Activity](/monitor/activity) and turn them into suggestions
+  </Card>
+  <Card title="Limit to 3–4 chips" icon="grip">
+    Too many options cause decision fatigue. Focus on the most valuable actions
+  </Card>
+</CardGroup>
+
+---
+
+## Examples
+
+Here are some suggestions for different use cases:
+
+| Use Case     | Label              | Message                                  |
+| ------------ | ------------------ | ---------------------------------------- |
+| E-commerce   | Track my order     | What is the status of my most recent order? |
+| E-commerce   | Return an item     | I want to start a return                 |
+| SaaS         | How do I get started? | Walk me through the initial setup     |
+| SaaS         | Upgrade plan       | What plans are available and how do I upgrade? |
+| Support      | Talk to a human    | I'd like to speak with a support agent   |
+| Support      | Billing issue      | I have a question about my bill          |
+
+<CardGroup cols={2}>
+  <Card title="Actions" icon="bolt" href="/agent/actions">
     Enable agent capabilities
   </Card>
-  <Card title="Workflows" icon="diagram-project" href="/workflows">
-    Guided multi-step flows
+  <Card title="Embed Widget" icon="code" href="/setup/embed-widget">
+    Full widget setup guide
   </Card>
 </CardGroup>

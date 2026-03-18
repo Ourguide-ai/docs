@@ -3,13 +3,29 @@ title: "Page Navigation"
 description: "Let your AI agent navigate users between pages"
 ---
 
-Page Navigation enables your AI agent to navigate users to different pages in your application. Define your routes on the dashboard and the agent handles the rest — no code required.
+Page Navigation enables your AI agent to navigate users to different pages in your application. Define your routes on the dashboard or let Ourguide auto-generate them from your website crawl — no code required.
 
-## Setup
+## Auto-Generated Routes from Website Crawl
+
+When you crawl your website via [Knowledge Base → Website](/knowledge-base/website), Ourguide automatically generates page navigation routes from the crawled pages. Here's what happens:
+
+1. Every crawled page URL is extracted and deduplicated
+2. An AI analyzes each page's content, title, and path to generate a human-readable **name** and **description**
+3. The routes are saved to your product and immediately available to the agent
+
+This means **if you've already added your website to the Knowledge Base, your routes are likely already set up** — no manual configuration needed.
+
+<Info>
+  Auto-generated routes replace any existing routes for the product each time you re-crawl. If you need to keep manually added routes, add them after the crawl completes.
+</Info>
+
+---
+
+## Manual Setup (Dashboard)
 
 1. Go to [Page Navigation](https://dashboard.ourguide.ai/dashboard/tools/page-navigation) in your dashboard
 2. Enable the Page Navigation toggle
-3. Add your application's routes
+3. Add your application's routes (or review the auto-generated ones from your website crawl)
 4. Click **Save**
 
 ## Defining Routes

@@ -32,18 +32,13 @@
             "group": "Get Started",
             "pages": [
               "get-started/introduction",
-              "get-started/quickstart",
-              "get-started/ourguide-docs-mcp"
+              "get-started/quickstart"
             ]
           },
           {
             "group": "Setup",
             "pages": [
               "setup/embed-widget",
-              "setup/react-native",
-              "setup/flutter",
-              "setup/multi-language-support",
-              "setup/customization",
               "setup/identity-verification",
               "setup/event-callbacks",
               "setup/deploy"
@@ -52,10 +47,8 @@
           {
             "group": "Agent",
             "pages": [
-              "agent/sandbox",
               "agent/actions",
               "agent/user-suggestions",
-              "agent/workflows",
               "agent/page-navigation"
             ]
           },
@@ -64,8 +57,7 @@
             "pages": [
               "knowledge-base/knowledge-base",
               "knowledge-base/files",
-              "knowledge-base/website",
-              "knowledge-base/notion"
+              "knowledge-base/website"
             ]
           },
           {
@@ -73,20 +65,15 @@
             "pages": [
               "integration/integration",
               "integration/api-integration",
-              "integration/envoy-cli",
               {
                 "group": "Server-Side Tools",
                 "pages": [
                   "integration/openapi",
-                  "integration/openapi-auth",
-                  "integration/mcp-servers",
-                  "integration/server-side-mcp-auth"
+                  "integration/openapi-auth"
                 ]
               },
-              "integration/multi-subdomain-endpoints",
               "integration/client-side-tools",
-              "integration/tool-renderers",
-              "integration/external-mcp-servers"
+              "integration/tool-renderers"
             ]
           },
           {

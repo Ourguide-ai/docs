@@ -5,7 +5,7 @@ description: "Get your agent live in 5 minutes"
 
 ## 1. Copy your script tag
 
-Go to [dashboard.ourguide.ai/deploy](https://dashboard.ourguide.ai/deploy) and copy your script tag.
+Go to [dashboard.ourguide.ai/dashboard/deploy/widget](https://dashboard.ourguide.ai/dashboard/deploy/widget) and copy your script tag.
 
 ## 2. Add to your site
 
@@ -13,14 +13,16 @@ Go to [dashboard.ourguide.ai/deploy](https://dashboard.ourguide.ai/deploy) and c
 
 ```html HTML
 <script
-  src="https://dashboard.ourguide.ai/static/ourguide-widget.js"
+  src="https://dashboard.ourguide.ai/ourguide-b2b-widget.iife.js"
   data-api-url="https://dashboard.ourguide.ai"
   data-product-id="YOUR_PRODUCT_ID"
 ></script>
 ```
 
 ```jsx React / Next.js
-import { OurguideWidget } from "@ourguide/react";
+import { OurguideWidget } from '@ourguide-ai/ui';
+import '@ourguide-ai/ui/styles.css';
+
 
 export default function App() {
   return (
@@ -32,18 +34,7 @@ export default function App() {
 }
 ```
 
-```vue Vue
-<template>
-  <OurguideWidget
-    api-url="https://dashboard.ourguide.ai"
-    product-id="YOUR_PRODUCT_ID"
-  />
-</template>
 
-<script setup>
-import { OurguideWidget } from "@ourguide/vue";
-</script>
-```
 
 </CodeGroup>
 
@@ -51,25 +42,23 @@ import { OurguideWidget } from "@ourguide/vue";
   Replace `YOUR_PRODUCT_ID` with the actual Product ID from your dashboard.
 </Warning>
 
-## 3. Configure your agent
 
-In [Sandbox](/sandbox), set your agent name and instructions. Test responses in the live preview.
 
-## 4. Add knowledge (optional)
+## 3. Add knowledge (optional)
 
-In the [Knowledge Base](/knowledge-base), upload PDFs, crawl your website, or connect Notion.
+In the [Knowledge Base](/knowledge-base/knowledge-base), upload PDFs, crawl your website.
 
-## 5. Connect your API (optional)
+## 4. Connect your API (optional)
 
-In [API Integration](/api-integration), upload your OpenAPI spec, configure auth, and select endpoints.
+In [API Integration](/integration/api-integration), upload your OpenAPI spec, configure auth, and select endpoints.
 
 ## Next Steps
 
 <CardGroup cols={2}>
-  <Card title="Identity Verification" icon="shield-halved" href="/identity-verification">
+  <Card title="Identity Verification" icon="shield-halved" href="/setup/identity-verification">
     Authenticate users for personalized experiences
   </Card>
-  <Card title="OpenAPI Authentication" icon="key" href="/openapi-auth">
+  <Card title="OpenAPI Authentication" icon="key" href="/integration/openapi-auth">
     Configure API auth (JWT Forward for user actions)
   </Card>
 </CardGroup>

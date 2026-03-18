@@ -6,7 +6,7 @@ description: "Connect third-party MCP servers to your agent"
 Connect third-party MCP servers to give your agent access to external services like Notion, databases, and more.
 
 <Note>
-  Looking to connect your own backend as an MCP server? See [Connect Your MCP Server](/mcp-servers) instead. This page is for connecting external MCP servers you don't control.
+  Looking to connect your own backend as an MCP server? See [Connect Your MCP Server](/integration/mcp-servers) instead. This page is for connecting external MCP servers you don't control.
 </Note>
 
 **What are MCP tools?** MCP is an open standard that lets AI agents connect to external services. By adding an MCP server, your Ourguide agent gains access to all tools that server exposes — no custom code required.
@@ -43,11 +43,11 @@ Connect third-party MCP servers to give your agent access to external services l
 
 ## Configuring Tools
 
-After connecting, go to [Actions](/actions) to enable or disable individual tools for your agent. Only enabled tools will be available when your agent responds to users.
+After connecting, go to [Actions](/agent/actions) to enable or disable individual tools for your agent. Only enabled tools will be available when your agent responds to users.
 
 ## Pre-built Integrations
 
-- **Notion** — Connect via [Knowledge Base → Notion](/notion) (uses MCP under the hood)
+- **Notion** — Connect via [Knowledge Base → Notion](/knowledge-base/notion) (uses MCP under the hood)
 - **Coming soon:** Slack, GitHub, Google Drive
 
 ## Troubleshooting
@@ -56,13 +56,13 @@ After connecting, go to [Actions](/actions) to enable or disable individual tool
 | ----------------------- | -------------------------------------------------- |
 | Connection failed       | Verify URL, check headers, try other transport     |
 | Tools not appearing     | Expand server to trigger discovery                 |
-| Agent not using tools   | Enable in [Actions](/actions), test in [Sandbox](/sandbox) |
+| Agent not using tools   | Enable in [Actions](/agent/actions), test in [Sandbox](/agent/sandbox) |
 
 <CardGroup cols={2}>
-  <Card title="Tool Renderers" icon="paintbrush" href="/tool-renderers">
+  <Card title="Tool Renderers" icon="paintbrush" href="/integration/tool-renderers">
     Render custom UI for tool results
   </Card>
-  <Card title="Activity" icon="chart-line" href="/activity">
+  <Card title="Activity" icon="chart-line" href="/monitor/activity">
     Monitor agent conversations
   </Card>
 </CardGroup>

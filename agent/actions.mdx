@@ -10,14 +10,11 @@ Actions are capabilities you enable for your agent. Go to the [Actions](https://
 | Type          | Source                | Example                               |
 | ------------- | --------------------- | ------------------------------------- |
 | **API Tools** | Your OpenAPI spec     | `getOrderStatus`, `createTicket`      |
-| **MCP Tools** | Connected MCP servers | Notion search, database queries       |
-| **Workflows** | You define them       | Onboarding flow, return request       |
 
 ## Enabling Actions
 
 1. **API Tools** — Check/uncheck individual endpoints from your OpenAPI spec
-2. **MCP Tools** — Toggle entire servers or individual tools
-3. **Workflows** — Enable/disable specific flows
+
 
 ## How the Agent Decides
 
@@ -34,14 +31,10 @@ The agent automatically chooses tools based on:
 ## Best Practices
 
 - **Start small** — Enable only what's needed, expand later
-- **Test in Sandbox** — Verify tools work before deploying
 - **Clear descriptions** — Help the agent understand when to use each tool
 
-<CardGroup cols={2}>
-  <Card title="OpenAPI" icon="plug" href="/openapi">
+<CardGroup cols={1}>
+  <Card title="OpenAPI" icon="plug" href="/integration/openapi">
     Set up API tools
-  </Card>
-  <Card title="Workflows" icon="diagram-project" href="/workflows">
-    Create guided flows
   </Card>
 </CardGroup>

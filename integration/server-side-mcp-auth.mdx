@@ -28,7 +28,7 @@ The widget sends the user's identity token (a JWT your backend minted) with ever
 | Purpose      | Proves who the end user is                                         |
 
 <Note>
-  This is the standard [Identity Verification](/identity-verification) flow. If you haven't set it up, users are treated as anonymous and identity headers won't be available.
+  This is the standard [Identity Verification](/setup/identity-verification) flow. If you haven't set it up, users are treated as anonymous and identity headers won't be available.
 </Note>
 
 ### Hop 2: Ourguide Backend → Your MCP Server
@@ -232,7 +232,7 @@ In the dashboard, under **Integration → Server-Side MCP → Header Mappings**,
 | `identity.<custom>`   | Any custom claim you include when minting the JWT        |
 
 <Note>
-  Identity claims are only available for authenticated users. If the user hasn't been identified via [Identity Verification](/identity-verification), identity headers won't be sent.
+  Identity claims are only available for authenticated users. If the user hasn't been identified via [Identity Verification](/setup/identity-verification), identity headers won't be sent.
 </Note>
 
 **`product.*`** — Fields from the Ourguide product configuration:
@@ -339,7 +339,7 @@ What happens when a user asks "show me my orders":
 <Check>Never expose your service key client-side. It's a server-to-server secret between your MCP server and your backend.</Check>
 <Check>Always validate the service key in your backend middleware.</Check>
 <Check>Use constant-time comparison for secret validation — never `==`.</Check>
-<Check>Set up [Identity Verification](/identity-verification) if your tools need to know who the user is.</Check>
+<Check>Set up [Identity Verification](/setup/identity-verification) if your tools need to know who the user is.</Check>
 <Check>Use HTTPS in production for your MCP server URL.</Check>
 
 ## Troubleshooting
@@ -347,7 +347,7 @@ What happens when a user asks "show me my orders":
 | Issue                             | Cause                               | Fix                                                                                  |
 | --------------------------------- | ----------------------------------- | ------------------------------------------------------------------------------------ |
 | Your backend returns `401`        | Service key mismatch or not set     | Copy the service key from **Deploy → API Keys** and add to your backend's `.env`    |
-| Identity headers are empty        | User not authenticated in the widget| Set up [Identity Verification](/identity-verification), ensure frontend calls `identify()` |
+| Identity headers are empty        | User not authenticated in the widget| Set up [Identity Verification](/setup/identity-verification), ensure frontend calls `identify()` |
 | `X-Service-Key` header missing    | No service key on the product       | Check **Deploy → API Keys** in dashboard                                             |
 | MCP server not receiving headers  | Wrong transport                     | Use Streamable HTTP (not SSE) for header support                                     |
 | Custom claims not forwarded       | Claim not in JWT                    | Ensure your backend includes the claim when minting the identity token               |

@@ -8,13 +8,13 @@ Ourguide is an embeddable AI agent that answers questions, takes actions, and kn
 ## Get Started
 
 <CardGroup cols={2}>
-  <Card title="Quickstart" icon="rocket" href="/quickstart">
+  <Card title="Quickstart" icon="rocket" href="/get-started/quickstart">
     Live in 5 minutes
   </Card>
-  <Card title="Identity Verification" icon="shield-halved" href="/identity-verification">
+  <Card title="Identity Verification" icon="shield-halved" href="/setup/identity-verification">
     Authenticate your users
   </Card>
-  <Card title="Ourguide Docs MCP" icon="robot" href="/ourguide-docs-mcp">
+  <Card title="Ourguide Docs MCP" icon="robot" href="/get-started/ourguide-docs-mcp">
     AI-assisted integration
   </Card>
 </CardGroup>
@@ -27,8 +27,8 @@ Add the Ourguide widget to your site with a single script tag:
 
 ```html Script Tag
 <script
-  src="https://api.ourguide.ai/static/ourguide-widget.js"
-  data-api-url="https://api.ourguide.ai"
+  src="https://dashboard.ourguide.ai/ourguide-b2b-widget.iife.js"
+  data-api-url="https://dashboard.ourguide.ai"
   data-product-id="YOUR_PRODUCT_ID"
 ></script>
 ```
@@ -52,10 +52,9 @@ export default function App() {
 
 | Feature                 | What it does                                                          |
 | ----------------------- | --------------------------------------------------------------------- |
-| **Knowledge Base**      | Agent learns from your docs, website, or Notion                       |
+| **Knowledge Base**      | Agent learns from your docs, website                    |
 | **API Integration**     | Agent calls your API to take actions (check orders, cancel subscriptions) |
 | **Identity Verification** | Agent knows who the user is and can act on their behalf             |
-| **Workflows**           | Guided multi-step flows for complex tasks                             |
 
 ## How it Works
 
@@ -63,30 +62,27 @@ export default function App() {
   <Step title="Embed">
     Add the script tag to your site.
   </Step>
-  <Step title="Configure">
-    Set instructions and add knowledge in the [Sandbox](/sandbox).
-  </Step>
   <Step title="Integrate">
-    Connect your API via [OpenAPI spec](/openapi) or [MCP](/mcp-servers).
+    Connect your API via [OpenAPI spec](/integration/openapi) or [MCP](/integration/mcp-servers).
   </Step>
   <Step title="Deploy">
-    Monitor conversations in [Activity](/activity).
+    Monitor conversations in [Activity](/monitor/activity).
   </Step>
 </Steps>
 
 ## Guides
 
 <CardGroup cols={2}>
-  <Card title="Knowledge Base" icon="book" href="/knowledge-base">
-    Files, websites, Notion
+  <Card title="Knowledge Base" icon="book" href="/knowledge-base/knowledge-base">
+    Files, websites
   </Card>
-  <Card title="API Integration" icon="plug" href="/api-integration">
+  <Card title="API Integration" icon="plug" href="/integration/api-integration">
     Connect your REST API
   </Card>
-  <Card title="Actions" icon="bolt" href="/actions">
+  <Card title="Actions" icon="bolt" href="/agent/actions">
     Enable agent capabilities
   </Card>
-  <Card title="OpenAPI Auth" icon="key" href="/openapi-auth">
+  <Card title="OpenAPI Auth" icon="key" href="/integration/openapi-auth">
     API Key, Bearer, JWT Forward
   </Card>
 </CardGroup>
