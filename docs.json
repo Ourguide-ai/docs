@@ -39,6 +39,7 @@
             "group": "Setup",
             "pages": [
               "setup/embed-widget",
+              "setup/flutter",
               "setup/identity-verification",
               "setup/deploy"
             ]

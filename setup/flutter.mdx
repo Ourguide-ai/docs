@@ -3,8 +3,7 @@ title: "Flutter"
 description: "Add Ourguide to your Flutter app"
 ---
 
-The `ourguide_flutter` package adds Ourguide to any Flutter app. Use `OurguideWidget` for a floating chat button that overlays your existing app, drop in `OurguideChatView` for a full-screen chat experience, or use `OurguideChatNotifier` directly to build a fully custom interface.
-
+The `ourguide_flutter` package adds Ourguide to any Flutter app. Use `OurguideWidget` for a floating chat button that overlays your existing app, drop in `OurguideChatView` for a full-screen chat experience.
 ## Installation
 
 ```bash
@@ -24,6 +23,7 @@ import 'package:flutter/material.dart';
 void main() => runApp(
   const OurguideScope(
     productId: 'YOUR_PRODUCT_ID',
+    apiUrl:'https://dashboard.ourguide.ai',
     child: MyApp(),
   ),
 );
@@ -84,10 +84,8 @@ class MyApp extends StatelessWidget {
 | Prop            | Required | Description                                                  |
 | --------------- | -------- | ------------------------------------------------------------ |
 | `productId`     | Yes      | Your product ID from the dashboard                           |
-| `apiUrl`        | No       | API URL (defaults to `https://dashboard.ourguide.ai`)       |
-| `model`         | No       | Override the default model                                   |
+| `apiUrl`        | Yes       | API URL                                                     |
 | `identityToken` | No       | JWT token for authenticated users                            |
-| `storage`       | No       | Custom storage adapter. Defaults to SharedPreferences        |
 
 ## OurguideWidget Props
 
@@ -137,71 +135,8 @@ OurguideChatView(
 | `poweredByColor`          | "Powered by Ourguide" text color                  |
 | `headerBorderColor`       | Bottom border of the header                       |
 | `messageTextStyle`        | Full `TextStyle` override for message text        |
-| `inputDecoration`         | Full `InputDecoration` override for the text field|
 
-## Custom UI (Headless)
 
-Access `OurguideChatNotifier` directly via `OurguideScope.chatOf(context)` to build your own UI:
-
-```dart
-class MyChatScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final notifier = OurguideScope.chatOf(context);
-
-    return ListenableBuilder(
-      listenable: notifier,
-      builder: (context, _) {
-        final state = notifier.state;
-        return Column(
-          children: [
-            Expanded(
-              child: ListView.builder(
-                itemCount: state.messages.length,
-                itemBuilder: (context, i) => Text(state.messages[i].content),
-              ),
-            ),
-            if (state.isLoading) const CircularProgressIndicator(),
-          ],
-        );
-      },
-    );
-  }
-}
-```
-
-### OurguideChatState
-
-| Property           | Type                      | Description                                    |
-| ------------------ | ------------------------- | ---------------------------------------------- |
-| `messages`         | `List<Message>`           | All messages in the current conversation       |
-| `isLoading`        | `bool`                    | Agent is currently streaming a response        |
-| `suggestedActions` | `List<SuggestedAction>`   | Quick reply suggestions from the agent         |
-| `isIdentified`     | `bool`                    | A token has been set for this user             |
-| `isVerified`       | `bool`                    | Server confirmed the user's identity           |
-
-### OurguideChatNotifier Methods
-
-| Method                    | Description                                  |
-| ------------------------- | -------------------------------------------- |
-| `sendMessage(String)`     | Send a message and stream the response       |
-| `stop()`                  | Cancel the current streaming response        |
-| `clear()`                 | Clear messages and start a new conversation  |
-| `identify(IdentifyOptions)`| Set a user identity token                   |
-| `resetUser()`             | Log out the current user                     |
-
-### Message Type
-
-```dart
-class Message {
-  final String id;
-  final MessageRole role; // MessageRole.user or MessageRole.assistant
-  final String content;
-  final DateTime timestamp;
-  final bool isStreaming;
-  final List<Citation> citations;
-}
-```
 
 ## User Identity
 
@@ -232,18 +167,19 @@ See [Identity Verification](/setup/identity-verification) for generating tokens 
 Register tools that run natively in your Flutter app:
 
 ```dart
-final client = OurguideScope.clientOf(context);
+final notifier = OurguideScope.chatOf(context);
 
-client.registerTool('navigateToScreen', (params) async {
-  final screen = params['screen'] as String;
-  Navigator.pushNamed(context, '/$screen');
-  return ToolResult.success({'navigated_to': screen});
-});
-
-client.registerTool('addToCart', (params) async {
-  final productId = params['product_id'] as String;
-  await cartController.add(productId);
-  return ToolResult.success({'added': productId});
+notifier.registerTools({
+  'navigateToScreen': (params) async {
+    final screen = params['screen'] as String;
+    Navigator.pushNamed(context, '/$screen');
+    return {'navigated_to': screen};
+  },
+  'addToCart': (params) async {
+    final productId = params['product_id'] as String;
+    await cartController.add(productId);
+    return {'added': productId};
+  },
 });
 ```
 
