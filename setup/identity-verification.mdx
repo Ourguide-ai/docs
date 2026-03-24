@@ -17,24 +17,24 @@ Identity verification lets your agent know who the user is — enabling personal
 ## How It Works
 
 1. User logs into **your** app
-2. Your backend mints an Ourguide identity token (JWT signed with your Ourguide secret)
-3. Your frontend calls `window.ourguide('identify', { token })`
+2. Your backend mints an Argide identity token (JWT signed with your Argide secret)
+3. Your frontend calls `window.argide('identify', { token })`
 4. Widget now knows who the user is
 
 <Info>
-  This is not your app's session JWT. It's a separate Ourguide-scoped identity token that your backend mints specifically for Ourguide. Your app JWT stays private.
+  This is not your app's session JWT. It's a separate Argide-scoped identity token that your backend mints specifically for Argide. Your app JWT stays private.
 </Info>
 
 ---
 
 ## 1. Get Your Secret
 
-Go to [dashboard.ourguide.ai/dashboard/deploy/widget](https://dashboard.ourguide.ai/dashboard/deploy/widget) → copy **Verification Secret**.
+Go to [dashboard.argide.ai/dashboard/deploy/widget](https://dashboard.argide.ai/dashboard/deploy/widget) → copy **Verification Secret**.
 
 Add to your backend environment:
 
 ```bash
-OURGUIDE_VERIFICATION_SECRET=your_secret_here
+ARGIDE_VERIFICATION_SECRET=your_secret_here
 ```
 
 <Warning>
@@ -48,7 +48,7 @@ OURGUIDE_VERIFICATION_SECRET=your_secret_here
 ```javascript Node.js (Express)
 const jwt = require('jsonwebtoken');
 
-app.get('/api/ourguide-token', authMiddleware, (req, res) => {
+app.get('/api/argide-token', authMiddleware, (req, res) => {
   const token = jwt.sign(
     {
       user_id: String(req.user.id),
@@ -56,7 +56,7 @@ app.get('/api/ourguide-token', authMiddleware, (req, res) => {
       email: req.user.email,
       name: req.user.name,
     },
-    process.env.OURGUIDE_VERIFICATION_SECRET,
+    process.env.ARGIDE_VERIFICATION_SECRET,
     { algorithm: 'HS256' }
   );
   res.json({ token });
@@ -68,8 +68,8 @@ import jwt
 import time
 from fastapi import Request
 
-@app.get("/api/ourguide-token")
-async def ourguide_token(request: Request):
+@app.get("/api/argide-token")
+async def argide_token(request: Request):
     user = request.state.user
     token = jwt.encode(
         {
@@ -78,7 +78,7 @@ async def ourguide_token(request: Request):
             "email": user.email,
             "name": user.name,
         },
-        os.environ["OURGUIDE_VERIFICATION_SECRET"],
+        os.environ["ARGIDE_VERIFICATION_SECRET"],
         algorithm="HS256",
     )
     return {"token": token}
@@ -88,9 +88,9 @@ async def ourguide_token(request: Request):
 import jwt
 import time
 
-@app.route("/api/ourguide-token")
+@app.route("/api/argide-token")
 @login_required
-def ourguide_token():
+def argide_token():
     token = jwt.encode(
         {
             "user_id": str(current_user.id),
@@ -98,7 +98,7 @@ def ourguide_token():
             "email": current_user.email,
             "name": current_user.name,
         },
-        os.environ["OURGUIDE_VERIFICATION_SECRET"],
+        os.environ["ARGIDE_VERIFICATION_SECRET"],
         algorithm="HS256",
     )
     return {"token": token}
@@ -120,15 +120,15 @@ def ourguide_token():
 <CodeGroup>
 
 ```jsx React SDK (Recommended)
-import { OurguideWidget } from "@ourguide-ai/ui";
+import { ArgideWidget } from "@argide/ui";
 
 function App() {
   return (
-    <OurguideWidget
+    <ArgideWidget
       productId="YOUR_PRODUCT_ID"
-      apiUrl="https://dashboard.ourguide.ai"
+      apiUrl="https://dashboard.argide.ai"
       getIdentityToken={async () => {
-        const res = await fetch('/api/ourguide-token');
+        const res = await fetch('/api/argide-token');
         const { token } = await res.json();
         return token;
       }}
@@ -138,8 +138,8 @@ function App() {
 ```
 
 ```javascript Script Tag
-window.ourguide('setIdentityTokenFetcher', async () => {
-  const res = await fetch('/api/ourguide-token');
+window.argide('setIdentityTokenFetcher', async () => {
+  const res = await fetch('/api/argide-token');
   const { token } = await res.json();
   return token;
 });
@@ -150,7 +150,7 @@ window.ourguide('setIdentityTokenFetcher', async () => {
 With the React SDK, pass `getIdentityToken` to the widget component. The SDK calls it on mount and auto-refreshes when the token expires — no manual polling needed.
 
 <Tip>
-  That's it. No `useEffect`, no `setInterval`, no `window.ourguide('identify')` calls.
+  That's it. No `useEffect`, no `setInterval`, no `window.argide('identify')` calls.
 </Tip>
 
 ## 4. Handle Logout
@@ -163,7 +163,7 @@ With the React SDK, pass `getIdentityToken` to the widget component. The SDK cal
 ```
 
 ```javascript Script Tag
-window.ourguide('resetUser');
+window.argide('resetUser');
 ```
 
 </CodeGroup>

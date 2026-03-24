@@ -3,7 +3,7 @@ title: "Envoy CLI"
 description: "Auto-generate an MCP server from your backend codebase"
 ---
 
-Envoy reads your backend code, generates a complete MCP server, and deploys it to Ourguide — so your agent can call your API without you writing any MCP code.
+Envoy reads your backend code, generates a complete MCP server, and deploys it to Argide — so your agent can call your API without you writing any MCP code.
 
 No MCP knowledge required. Envoy analyzes your routes, schemas, and auth patterns, then builds and deploys a production-ready MCP server for you.
 
@@ -12,13 +12,13 @@ No MCP knowledge required. Envoy analyzes your routes, schemas, and auth pattern
 Run this from the root directory that contains your project folders (backend, frontend, etc.). Envoy will ask which directories are relevant before it starts.
 
 ```bash
-export OURGUIDE_API_KEY=ck_...
-npx @ourguide/envoy
+export ARGIDE_API_KEY=ck_...
+npx @argide/envoy
 ```
 
 ### Get Your API Key
 
-1. Go to [dashboard.ourguide.ai](https://dashboard.ourguide.ai) → **Tools**
+1. Go to [dashboard.argide.ai](https://dashboard.argide.ai) → **Tools**
 2. Click **Generate Envoy Key**
 3. Copy the `ck_...` key
 
@@ -34,7 +34,7 @@ npx @ourguide/envoy
 
 | Flag                  | Description                                                       |
 | --------------------- | ----------------------------------------------------------------- |
-| `--api-key <key>`     | Ourguide API key (alternative to `OURGUIDE_API_KEY` env var)     |
+| `--api-key <key>`     | Argide API key (alternative to `ARGIDE_API_KEY` env var)     |
 | `--ci`                | CI mode — structured JSON output on stdout                        |
 | `--dirs <a,b,c>`      | Comma-separated directories to scan (CI mode, skips interactive prompt) |
 | `--help, -h`          | Show help                                                         |
@@ -43,11 +43,11 @@ npx @ourguide/envoy
 ## How It Works
 
 ```
-1. npx @ourguide/envoy
+1. npx @argide/envoy
 2. Envoy scans your project directories
 3. AI agent analyzes routes, schemas, auth patterns
 4. Generates a complete MCP server (server.py + requirements.txt)
-5. Saves to Ourguide with versioning
+5. Saves to Argide with versioning
 6. Deploy when ready → your agent can now call your API
 ```
 
@@ -92,21 +92,21 @@ async def cancel_order(order_id: str) -> dict:
 ### First Time: Generate
 
 ```bash
-export OURGUIDE_API_KEY=ck_...
-npx @ourguide/envoy
+export ARGIDE_API_KEY=ck_...
+npx @argide/envoy
 ```
 
 1. Select which directories to scan
 2. Envoy reads your code and generates an MCP server
 3. Review the generated tools in a conversation loop
-4. When satisfied, the server is saved to Ourguide
+4. When satisfied, the server is saved to Argide
 
 ### Iterate: Fix
 
 Loads your existing MCP server and lets you make changes:
 
 ```bash
-npx @ourguide/envoy fix
+npx @argide/envoy fix
 ```
 
 ```
@@ -117,10 +117,10 @@ npx @ourguide/envoy fix
 
 ### Ship: Deploy
 
-Deploys the latest saved version. Your Ourguide agent immediately starts using the new tools.
+Deploys the latest saved version. Your Argide agent immediately starts using the new tools.
 
 ```bash
-npx @ourguide/envoy deploy
+npx @argide/envoy deploy
 ```
 
 ## CI Mode
@@ -128,7 +128,7 @@ npx @ourguide/envoy deploy
 For automated pipelines, use `--ci` for structured JSON output:
 
 ```bash
-OURGUIDE_API_KEY=ck_... npx @ourguide/envoy --ci --dirs backend,shared
+ARGIDE_API_KEY=ck_... npx @argide/envoy --ci --dirs backend,shared
 ```
 
 This skips interactive prompts and outputs JSON to stdout.
@@ -137,8 +137,8 @@ This skips interactive prompts and outputs JSON to stdout.
 
 | Variable            | Required | Description                                        |
 | ------------------- | -------- | -------------------------------------------------- |
-| `OURGUIDE_API_KEY`  | Yes      | Your Ourguide Envoy API key (`ck_...`)             |
-| `OURGUIDE_API_URL`  | No       | Override API URL (for development only)            |
+| `ARGIDE_API_KEY`  | Yes      | Your Argide Envoy API key (`ck_...`)             |
+| `ARGIDE_API_URL`  | No       | Override API URL (for development only)            |
 
 ## Envoy vs Manual MCP Setup
 
@@ -146,8 +146,8 @@ This skips interactive prompts and outputs JSON to stdout.
 | --------------------- | ---------------------------------- | ----------------------------------------- |
 | Setup time            | Minutes                            | Hours                                     |
 | MCP knowledge needed  | None                               | Yes                                       |
-| Hosting               | Ourguide hosts it for you          | You host your own server                  |
-| Updating              | `npx @ourguide/envoy fix`          | Edit code, redeploy                       |
+| Hosting               | Argide hosts it for you          | You host your own server                  |
+| Updating              | `npx @argide/envoy fix`          | Edit code, redeploy                       |
 | Best for              | Getting started fast, standard REST APIs | Custom logic, complex auth, full control |
 
 <Note>

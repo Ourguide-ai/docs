@@ -1,29 +1,29 @@
 ---
 title: "Flutter"
-description: "Add Ourguide to your Flutter app"
+description: "Add Argide to your Flutter app"
 ---
 
-The `ourguide_flutter` package adds Ourguide to any Flutter app. Use `OurguideWidget` for a floating chat button that overlays your existing app, drop in `OurguideChatView` for a full-screen chat experience.
+The `argide_flutter` package adds Argide to any Flutter app. Use `ArgideWidget` for a floating chat button that overlays your existing app, drop in `ArgideChatView` for a full-screen chat experience.
 ## Installation
 
 ```bash
-flutter pub add ourguide_flutter
+flutter pub add argide_flutter
 ```
 
 ## Quick Start
 
 ### Floating Widget (Recommended)
 
-Add `OurguideWidget` inside a `Stack` to get a floating chat button that slides up a chat sheet — zero extra UI work:
+Add `ArgideWidget` inside a `Stack` to get a floating chat button that slides up a chat sheet — zero extra UI work:
 
 ```dart
-import 'package:ourguide_flutter/ourguide_flutter.dart';
+import 'package:argide_flutter/argide_flutter.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(
-  const OurguideScope(
+  const ArgideScope(
     productId: 'YOUR_PRODUCT_ID',
-    apiUrl:'https://dashboard.ourguide.ai',
+    apiUrl:'https://dashboard.argide.ai',
     child: MyApp(),
   ),
 );
@@ -34,9 +34,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      // builder wraps every route — OurguideWidget appears on all pages
+      // builder wraps every route — ArgideWidget appears on all pages
       builder: (context, child) => Stack(
-        children: [child!, const OurguideWidget()],
+        children: [child!, const ArgideWidget()],
       ),
       home: const HomeScreen(),
     );
@@ -45,19 +45,19 @@ class MyApp extends StatelessWidget {
 ```
 
 <Note>
-  Placing `OurguideWidget` in `MaterialApp.builder` means it automatically appears on every page and route in your app — no need to add it to each screen individually. Tapping the button slides up a chat sheet at 85% screen height.
+  Placing `ArgideWidget` in `MaterialApp.builder` means it automatically appears on every page and route in your app — no need to add it to each screen individually. Tapping the button slides up a chat sheet at 85% screen height.
 </Note>
 
 ### Full-Screen Chat
 
-Wrap your app with `OurguideScope` and drop in `OurguideChatView` as the full body:
+Wrap your app with `ArgideScope` and drop in `ArgideChatView` as the full body:
 
 ```dart
-import 'package:ourguide_flutter/ourguide_flutter.dart';
+import 'package:argide_flutter/argide_flutter.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(
-  const OurguideScope(
+  const ArgideScope(
     productId: 'YOUR_PRODUCT_ID',
     child: MyApp(),
   ),
@@ -69,17 +69,17 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      home: Scaffold(body: OurguideChatView()),
+      home: Scaffold(body: ArgideChatView()),
     );
   }
 }
 ```
 
-`OurguideChatView` includes message bubbles, streaming, conversation history, suggested actions, and a "Powered by Ourguide" footer — no additional setup required.
+`ArgideChatView` includes message bubbles, streaming, conversation history, suggested actions, and a "Powered by Argide" footer — no additional setup required.
 
-## OurguideScope Props
+## ArgideScope Props
 
-`OurguideScope` is an `InheritedWidget` that provides the client and state down the widget tree.
+`ArgideScope` is an `InheritedWidget` that provides the client and state down the widget tree.
 
 | Prop            | Required | Description                                                  |
 | --------------- | -------- | ------------------------------------------------------------ |
@@ -87,25 +87,25 @@ class MyApp extends StatelessWidget {
 | `apiUrl`        | Yes       | API URL                                                     |
 | `identityToken` | No       | JWT token for authenticated users                            |
 
-## OurguideWidget Props
+## ArgideWidget Props
 
 | Prop    | Required | Description                                             |
 | ------- | -------- | ------------------------------------------------------- |
-| `theme` | No       | `OurguideTheme` instance to customize the chat sheet appearance |
+| `theme` | No       | `ArgideTheme` instance to customize the chat sheet appearance |
 
-## OurguideChatView Props
+## ArgideChatView Props
 
 | Prop    | Required | Description                                        |
 | ------- | -------- | -------------------------------------------------- |
-| `theme` | No       | `OurguideTheme` instance to customize appearance   |
+| `theme` | No       | `ArgideTheme` instance to customize appearance   |
 
 ## Theming
 
-Customize colors and styles via `OurguideTheme`:
+Customize colors and styles via `ArgideTheme`:
 
 ```dart
-OurguideChatView(
-  theme: OurguideTheme(
+ArgideChatView(
+  theme: ArgideTheme(
     backgroundColor: Colors.white,
     userBubbleColor: Colors.white,
     userBubbleTextColor: const Color(0xFF111827),
@@ -132,7 +132,7 @@ OurguideChatView(
 | `bubbleBorderRadius`      | Corner radius for message bubbles                 |
 | `inputBorderColor`        | Input bar border color                            |
 | `inputBorderLoadingColor` | Input border color while streaming                |
-| `poweredByColor`          | "Powered by Ourguide" text color                  |
+| `poweredByColor`          | "Powered by Argide" text color                  |
 | `headerBorderColor`       | Bottom border of the header                       |
 | `messageTextStyle`        | Full `TextStyle` override for message text        |
 
@@ -143,14 +143,14 @@ OurguideChatView(
 Identify users to enable conversation history and personalized responses:
 
 ```dart
-final notifier = OurguideScope.chatOf(context);
+final notifier = ArgideScope.chatOf(context);
 
 // From a login handler
 final token = await fetchTokenFromYourBackend();
 notifier.identify(IdentifyOptions(token: token));
 
-// Or pass via OurguideScope props (auto-updates when token changes)
-OurguideScope(
+// Or pass via ArgideScope props (auto-updates when token changes)
+ArgideScope(
   productId: 'YOUR_PRODUCT_ID',
   identityToken: userToken,
   child: MyApp(),
@@ -167,7 +167,7 @@ See [Identity Verification](/setup/identity-verification) for generating tokens 
 Register tools that run natively in your Flutter app:
 
 ```dart
-final notifier = OurguideScope.chatOf(context);
+final notifier = ArgideScope.chatOf(context);
 
 notifier.registerTools({
   'navigateToScreen': (params) async {
@@ -206,13 +206,13 @@ No additional configuration needed. For macOS apps, add the outbound networking 
 
 ## Differences from Other SDKs
 
-| Feature    | Web (`@ourguide/ui`)    | React Native              | Flutter                      |
+| Feature    | Web (`@argide/ui`)    | React Native              | Flutter                      |
 | ---------- | ----------------------- | ------------------------- | ---------------------------- |
 | Language   | TypeScript              | TypeScript                | Dart                         |
-| Drop-in UI | `<OurguideWidget />`    | `<OurguideWidget />`      | `OurguideWidget`             |
-| State      | `useChat()` hook        | `useChat()` hook          | `OurguideChatNotifier`       |
+| Drop-in UI | `<ArgideWidget />`    | `<ArgideWidget />`      | `ArgideWidget`             |
+| State      | `useChat()` hook        | `useChat()` hook          | `ArgideChatNotifier`       |
 | Storage    | localStorage            | AsyncStorage adapter      | SharedPreferences (built-in) |
-| Provider   | `<OurguideProvider>`    | `<OurguideProvider>`      | `OurguideScope`              |
+| Provider   | `<ArgideProvider>`    | `<ArgideProvider>`      | `ArgideScope`              |
 
 <CardGroup cols={2}>
   <Card title="Identity Verification" icon="shield-halved" href="/setup/identity-verification">

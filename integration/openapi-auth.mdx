@@ -3,7 +3,7 @@ title: "OpenAPI Authentication"
 description: "Configure API authentication for your agent"
 ---
 
-How Ourguide authenticates when calling your API.
+How Argide authenticates when calling your API.
 
 ## Auth Types
 
@@ -65,17 +65,17 @@ security:
 
 ## JWT Forward
 
-Your agent forwards the user's Ourguide identity token to your API. This enables user-specific actions like "check my orders" or "cancel my subscription."
+Your agent forwards the user's Argide identity token to your API. This enables user-specific actions like "check my orders" or "cancel my subscription."
 
 <Info>
-  This is not your app's session JWT. It's an Ourguide-scoped identity token your backend mints with `OURGUIDE_VERIFICATION_SECRET`. See [Identity Verification](/setup/identity-verification).
+  This is not your app's session JWT. It's an Argide-scoped identity token your backend mints with `ARGIDE_VERIFICATION_SECRET`. See [Identity Verification](/setup/identity-verification).
 </Info>
 
 ### How it works
 
-1. Your backend mints an Ourguide identity token (JWT signed with Ourguide secret)
-2. Frontend passes it to widget: `window.ourguide('identify', { token })`
-3. When calling your API, Ourguide forwards that same token
+1. Your backend mints an Argide identity token (JWT signed with Argide secret)
+2. Frontend passes it to widget: `window.argide('identify', { token })`
+3. When calling your API, Argide forwards that same token
 4. Your API verifies it (same secret) and identifies the user
 
 **OpenAPI spec:**
@@ -111,7 +111,7 @@ const jwt = require('jsonwebtoken');
 function authMiddleware(req, res, next) {
   const token = req.headers.authorization?.split(' ')[1];
   try {
-    const payload = jwt.verify(token, process.env.OURGUIDE_VERIFICATION_SECRET);
+    const payload = jwt.verify(token, process.env.ARGIDE_VERIFICATION_SECRET);
     req.user = { id: payload.user_id, email: payload.email };
     next();
   } catch {
@@ -134,7 +134,7 @@ def auth_required(f):
     async def decorated(request, *args, **kwargs):
         token = request.headers.get("Authorization", "").split(" ")[1]
         try:
-            payload = jwt.decode(token, os.environ["OURGUIDE_VERIFICATION_SECRET"], algorithms=["HS256"])
+            payload = jwt.decode(token, os.environ["ARGIDE_VERIFICATION_SECRET"], algorithms=["HS256"])
             request.state.user = {"id": payload["user_id"], "email": payload.get("email")}
         except jwt.InvalidTokenError:
             return JSONResponse({"error": "Invalid token"}, status_code=401)

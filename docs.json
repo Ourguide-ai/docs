@@ -1,11 +1,11 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Ourguide",
+  "name": "Argide",
   "logo": {
     "light": "/logo/logo.jpg",
     "dark": "/logo/logo.jpg",
-    "href": "https://ourguide.mintlify.app"
+    "href": "https://argide.mintlify.app"
   },
   "favicon": "/logo/logo.jpg",
   "colors": {
@@ -16,12 +16,12 @@
   "topbarLinks": [
     {
       "name": "Support",
-      "url": "mailto:support@ourguide.com"
+      "url": "mailto:support@argide.com"
     }
   ],
   "topbarCtaButton": {
     "name": "Dashboard",
-    "url": "https://dashboard.ourguide.ai"
+    "url": "https://dashboard.argide.ai"
   },
   "navigation": {
     "tabs": [
@@ -87,8 +87,8 @@
     ]
   },
   "footerSocials": {
-    "x": "https://x.com/ourguide",
+    "x": "https://x.com/argide",
     "github": "https://github.com/Abhinav-2026",
-    "linkedin": "https://www.linkedin.com/company/ourguide"
+    "linkedin": "https://www.linkedin.com/company/argide"
   }
 }

@@ -3,7 +3,7 @@ title: "Event Callbacks"
 description: "Listen to agent events — messages, tool calls, errors, and more"
 ---
 
-Hook into the agent's lifecycle to build custom experiences on top of Ourguide.
+Hook into the agent's lifecycle to build custom experiences on top of Argide.
 
 ## Available Callbacks
 
@@ -21,11 +21,11 @@ Hook into the agent's lifecycle to build custom experiences on top of Ourguide.
 Pass callbacks via the `client.on()` method:
 
 ```javascript
-import { OurguideClient } from '@ourguide/client';
+import { ArgideClient } from '@argide/client';
 
-const client = new OurguideClient({
+const client = new ArgideClient({
   productId: 'YOUR_PRODUCT_ID',
-  apiUrl: 'https://api.ourguide.ai',
+  apiUrl: 'https://api.argide.ai',
 });
 
 client.on({
@@ -132,7 +132,7 @@ Track which tools are used and how often:
 client.on({
   onToolCall: (event) => {
     if (event.type === 'tool_call_complete') {
-      analytics.track('ourguide_tool_used', {
+      analytics.track('argide_tool_used', {
         tool: event.toolName,
         success: event.success,
       });

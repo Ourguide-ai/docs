@@ -1,16 +1,16 @@
 ---
-title: "Ourguide Docs MCP"
-description: "Connect your coding agent to Ourguide's documentation using MCP"
+title: "Argide Docs MCP"
+description: "Connect your coding agent to Argide documentation using MCP"
 ---
 
-The **Model Context Protocol (MCP)** allows you to connect AI coding agents to Ourguide's documentation. Once connected, your agent can help you integrate Ourguide into your codebase with full context of our APIs and features.
+The **Model Context Protocol (MCP)** allows you to connect AI coding agents to Argide documentation. Once connected, your agent can help you integrate Argide into your codebase with full context of our APIs and features.
 
 ## Server URL
 
 Add this URL to your coding agent's MCP configuration. Works with **Cursor**, **Claude**, **Windsurf**, and any MCP-compatible tool.
 
 ```
-https://docs.ourguide.ai/mcp
+https://docs.argide.ai/mcp
 ```
 
 <Tip>
@@ -19,12 +19,12 @@ https://docs.ourguide.ai/mcp
 
 ## What you can do
 
-With Ourguide Docs MCP connected, your coding agent can:
+With Argide Docs MCP connected, your coding agent can:
 
-- Help integrate the Ourguide widget into your website
+- Help integrate the Argide widget into your website
 - Set up identity verification for authenticated users
 - Configure OpenAPI or MCP server integrations
-- Understand how to use Ourguide's features
+- Understand how to use Argide's features
 
 ## Setup
 
@@ -35,8 +35,8 @@ Add the following to your `.cursor/mcp.json`:
 ```json
 {
   "mcpServers": {
-    "ourguide-docs": {
-      "url": "https://docs.ourguide.ai/mcp"
+    "argide-docs": {
+      "url": "https://docs.argide.ai/mcp"
     }
   }
 }
@@ -49,8 +49,8 @@ Add to your Claude Desktop MCP config:
 ```json
 {
   "mcpServers": {
-    "ourguide-docs": {
-      "url": "https://docs.ourguide.ai/mcp"
+    "argide-docs": {
+      "url": "https://docs.argide.ai/mcp"
     }
   }
 }
@@ -58,7 +58,7 @@ Add to your Claude Desktop MCP config:
 
 ### Other MCP-compatible tools
 
-Use the server URL `https://docs.ourguide.ai/mcp` in any tool that supports the Model Context Protocol.
+Use the server URL `https://docs.argide.ai/mcp` in any tool that supports the Model Context Protocol.
 
 <Card title="Learn more about MCP" icon="link" href="https://modelcontextprotocol.io">
   Visit the official Model Context Protocol documentation.

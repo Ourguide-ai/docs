@@ -3,11 +3,11 @@ title: "Page Navigation"
 description: "Let your AI agent navigate users between pages"
 ---
 
-Page Navigation enables your AI agent to navigate users to different pages in your application. Define your routes on the dashboard or let Ourguide auto-generate them from your website crawl — no code required.
+Page Navigation enables your AI agent to navigate users to different pages in your application. Define your routes on the dashboard or let Argide auto-generate them from your website crawl — no code required.
 
 ## Auto-Generated Routes from Website Crawl
 
-When you crawl your website via [Knowledge Base → Website](/knowledge-base/website), Ourguide automatically generates page navigation routes from the crawled pages. Here's what happens:
+When you crawl your website via [Knowledge Base → Website](/knowledge-base/website), Argide automatically generates page navigation routes from the crawled pages. Here's what happens:
 
 1. Every crawled page URL is extracted and deduplicated
 2. An AI analyzes each page's content, title, and path to generate a human-readable **name** and **description**
@@ -23,7 +23,7 @@ This means **if you've already added your website to the Knowledge Base, your ro
 
 ## Manual Setup (Dashboard)
 
-1. Go to [Page Navigation](https://dashboard.ourguide.ai/dashboard/tools/page-navigation) in your dashboard
+1. Go to [Page Navigation](https://dashboard.argide.ai/dashboard/tools/page-navigation) in your dashboard
 2. Enable the Page Navigation toggle
 3. Add your application's routes (or review the auto-generated ones from your website crawl)
 4. Click **Save**
@@ -83,12 +83,12 @@ Pass your framework's router function via the `navigate` prop. The SDK handles r
 
 ```jsx React Router
 import { useNavigate } from 'react-router-dom';
-import { OurguideWidget } from '@ourguide/react';
+import { ArgideWidget } from '@argide/react';
 
 function App() {
   const navigate = useNavigate();
   return (
-    <OurguideWidget
+    <ArgideWidget
       productId="your-product-id"
       navigate={(path) => navigate(path)}
     />
@@ -98,12 +98,12 @@ function App() {
 
 ```jsx Next.js
 import { useRouter } from 'next/navigation';
-import { OurguideWidget } from '@ourguide/react';
+import { ArgideWidget } from '@argide/react';
 
 function App() {
   const router = useRouter();
   return (
-    <OurguideWidget
+    <ArgideWidget
       productId="your-product-id"
       navigate={(path) => router.push(path)}
     />

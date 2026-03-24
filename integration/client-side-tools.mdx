@@ -3,7 +3,7 @@ title: "Client-Side Tools"
 description: "Register tools that run in the user's browser"
 ---
 
-Client-side tools execute in the browser instead of on a server. You register handlers via `window.ourguide('registerTools', {...})`, and the agent calls them like any other tool — but the work happens client-side.
+Client-side tools execute in the browser instead of on a server. You register handlers via `window.argide('registerTools', {...})`, and the agent calls them like any other tool — but the work happens client-side.
 
 ## When to Use
 
@@ -25,7 +25,7 @@ Use client-side tools for browser-only actions:
 In your app code, register functions the widget can call:
 
 ```js
-window.ourguide('registerTools', {
+window.argide('registerTools', {
   exportListToCSV: async ({ fileName }) => {
     // ... build CSV from app state
     downloadCsv(data, fileName || 'export');
@@ -36,7 +36,7 @@ window.ourguide('registerTools', {
 
 ### 2. Upload Tool Definitions
 
-On the [Actions](https://dashboard.ourguide.ai/dashboard/tools/client-tools) page, upload a JSON definition so the agent knows the tool exists:
+On the [Actions](https://dashboard.argide.ai/dashboard/tools/client-tools) page, upload a JSON definition so the agent knows the tool exists:
 
 ```json
 [{
@@ -72,13 +72,13 @@ The returned object is sent back to the agent so it can incorporate the result i
 For tools that take a few seconds, call `setToolStatus` to show a spinning indicator with a status message inside the widget. Clear it when done.
 
 ```js
-window.ourguide('registerTools', {
+window.argide('registerTools', {
   createAndPopulateList: async ({ listName }) => {
-    window.ourguide('setToolStatus', 'Creating list...');
+    window.argide('setToolStatus', 'Creating list...');
     await createList(listName);
-    window.ourguide('setToolStatus', 'Adding leads...');
+    window.argide('setToolStatus', 'Adding leads...');
     await addLeads();
-    window.ourguide('setToolStatus', ''); // clear
+    window.argide('setToolStatus', ''); // clear
     return { status: 'success' };
   }
 });
@@ -91,16 +91,16 @@ The status appears above the input box with a spinner while non-empty, and disap
 ```mermaid
 sequenceDiagram
     participant User
-    participant OurguideCopilot
-    participant OurguideBackend as Ourguide Backend
+    participant ArgideCopilot
+    participant ArgideBackend as Argide Backend
 
-    User->>OurguideCopilot: "Export this list as CSV"
-    OurguideCopilot->>OurguideBackend: POST /chat/message
-    OurguideBackend-->>OurguideCopilot: SSE tool_call (exportListToCSV)
-    OurguideCopilot->>OurguideCopilot: Runs registered handler in browser
-    OurguideCopilot->>OurguideBackend: Tool result
-    OurguideBackend-->>OurguideCopilot: SSE assistant message
-    OurguideCopilot->>User: "Done — exported 142 rows"
+    User->>ArgideCopilot: "Export this list as CSV"
+    ArgideCopilot->>ArgideBackend: POST /chat/message
+    ArgideBackend-->>ArgideCopilot: SSE tool_call (exportListToCSV)
+    ArgideCopilot->>ArgideCopilot: Runs registered handler in browser
+    ArgideCopilot->>ArgideBackend: Tool result
+    ArgideBackend-->>ArgideCopilot: SSE assistant message
+    ArgideCopilot->>User: "Done — exported 142 rows"
 ```
 
 1. **User asks** — The message is sent to the agent

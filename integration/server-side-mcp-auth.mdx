@@ -3,7 +3,7 @@ title: "Server-Side MCP Authentication"
 description: "Service keys, identity headers, and how the full auth chain works"
 ---
 
-This page explains exactly how authentication works when Ourguide calls your MCP server, and how your MCP server authenticates with your own backend API. Every header, every token, every hop.
+This page explains exactly how authentication works when Argide calls your MCP server, and how your MCP server authenticates with your own backend API. Every header, every token, every hop.
 
 ## The Auth Chain
 
@@ -11,29 +11,29 @@ There are three hops in the full chain:
 
 ```
 ┌──────────┐        ┌─────────────────┐        ┌────────────┐        ┌─────────────┐
-│  Widget  │──(1)──→│ Ourguide Backend│──(2)──→│ MCP Server │──(3)──→│ Backend API │
+│  Widget  │──(1)──→│ Argide Backend│──(2)──→│ MCP Server │──(3)──→│ Backend API │
 │(browser) │        │                 │        │  (yours)   │        │   (yours)   │
 └──────────┘        └─────────────────┘        └────────────┘        └─────────────┘
 ```
 
-### Hop 1: Widget → Ourguide Backend
+### Hop 1: Widget → Argide Backend
 
 The widget sends the user's identity token (a JWT your backend minted) with every chat message.
 
 | What         | Value                                                              |
 | ------------ | ------------------------------------------------------------------ |
-| Token        | Identity JWT (signed with your Ourguide verification secret)       |
+| Token        | Identity JWT (signed with your Argide verification secret)       |
 | Sent as      | `identity_token` field in the chat request body                    |
-| Validated by | Ourguide backend using your product's verification secret          |
+| Validated by | Argide backend using your product's verification secret          |
 | Purpose      | Proves who the end user is                                         |
 
 <Note>
   This is the standard [Identity Verification](/setup/identity-verification) flow. If you haven't set it up, users are treated as anonymous and identity headers won't be available.
 </Note>
 
-### Hop 2: Ourguide Backend → Your MCP Server
+### Hop 2: Argide Backend → Your MCP Server
 
-When Ourguide connects to your MCP server to execute tools, it sends three types of headers:
+When Argide connects to your MCP server to execute tools, it sends three types of headers:
 
 | Header           | Source                                       | Example Value                  |
 | ---------------- | -------------------------------------------- | ------------------------------ |
@@ -41,7 +41,7 @@ When Ourguide connects to your MCP server to execute tools, it sends three types
 | Static headers   | Whatever you configured in the dashboard     | `Authorization: Bearer sk-...` |
 | Identity headers | Resolved from header mappings (see below)    | `X-User-ID: user_456`          |
 
-Your MCP server automatically receives the service key — Ourguide reads it from your product config and injects it into every request. You don't need to configure anything for this to happen.
+Your MCP server automatically receives the service key — Argide reads it from your product config and injects it into every request. You don't need to configure anything for this to happen.
 
 ### Hop 3: Your MCP Server → Your Backend API
 
@@ -52,7 +52,7 @@ Your MCP server wraps your existing backend API. When a tool executes, it calls 
 | Header       | `X-Service-Key`                                                           |
 | Value        | The same service key from hop 2, forwarded by your MCP server             |
 | Validated by | Your backend's auth middleware                                            |
-| Purpose      | Proves the request is from a trusted service (your MCP server, called by Ourguide) |
+| Purpose      | Proves the request is from a trusted service (your MCP server, called by Argide) |
 
 <Note>
   Your existing user auth (Clerk, Auth0, Firebase, etc.) stays completely unchanged. The service key adds a second auth path alongside it — it doesn't replace anything.
@@ -60,12 +60,12 @@ Your MCP server wraps your existing backend API. When a tool executes, it calls 
 
 ## Service Keys
 
-A service key is a shared secret that lets your MCP server authenticate with your backend API. Think of it like a Stripe secret key — Ourguide generates it, you copy it to your backend.
+A service key is a shared secret that lets your MCP server authenticate with your backend API. Think of it like a Stripe secret key — Argide generates it, you copy it to your backend.
 
 ```
-Ourguide generates and stores the service key
+Argide generates and stores the service key
 │
-├──→ Ourguide auto-injects it as X-Service-Key header
+├──→ Argide auto-injects it as X-Service-Key header
 │    when calling your MCP server (Hop 2)
 │
 └──→ You copy it from the dashboard and add it to
@@ -74,16 +74,16 @@ Ourguide generates and stores the service key
 
 | Where              | Env Var                                         | Purpose                                          |
 | ------------------ | ----------------------------------------------- | ------------------------------------------------ |
-| Your MCP server    | Received automatically via `X-Service-Key` header from Ourguide | Forwarded to your backend API    |
+| Your MCP server    | Received automatically via `X-Service-Key` header from Argide | Forwarded to your backend API    |
 | Your backend API   | `MCP_SERVICE_KEY` in `.env`                     | Validates incoming requests from the MCP server  |
 
 <Note>
-  Ourguide is the source of truth. You never generate the key yourself.
+  Argide is the source of truth. You never generate the key yourself.
 </Note>
 
 ### Where to Find Your Service Key
 
-1. Go to **Deploy → API Keys** in the Ourguide dashboard
+1. Go to **Deploy → API Keys** in the Argide dashboard
 2. Copy the **Service Key**
 3. Add it to your backend's `.env`:
 
@@ -108,7 +108,7 @@ async def verify_auth(request: Request):
     Path 1: Service key present → trusted service, read user from headers
     Path 2: No service key → normal user auth (Clerk, Auth0, etc.)
     """
-    # Path 1: Service key (from MCP server via Ourguide)
+    # Path 1: Service key (from MCP server via Argide)
     service_key = request.headers.get("x-service-key")
     if service_key and SERVICE_KEY:
         if hmac.compare_digest(service_key, SERVICE_KEY):
@@ -141,7 +141,7 @@ When the service key is present, your backend trusts the scoping headers (`X-Use
 
 ### Your MCP Server — Forwarding the Key
 
-Your MCP server receives `X-Service-Key` from Ourguide automatically. It just needs to include it when calling your backend:
+Your MCP server receives `X-Service-Key` from Argide automatically. It just needs to include it when calling your backend:
 
 ```python
 import os
@@ -151,7 +151,7 @@ from fastmcp.dependencies import Depends, CurrentHeaders
 
 mcp = FastMCP("My Backend")
 
-# Your backend API (not Ourguide's)
+# Your backend API (not Argide's)
 API_BASE = os.environ.get("API_BASE_URL", "http://localhost:8000")
 
 async def get_api_client(headers: dict = CurrentHeaders()) -> httpx.AsyncClient:
@@ -180,12 +180,12 @@ async def get_order(
 ```
 
 <Note>
-  For local development, you can set `SERVICE_KEY` as an env var on the MCP server as a fallback. In production, the header from Ourguide is the primary source.
+  For local development, you can set `SERVICE_KEY` as an env var on the MCP server as a fallback. In production, the header from Argide is the primary source.
 </Note>
 
 ## Identity Headers
 
-Identity headers let your MCP server (and your backend) know who the end user is. Ourguide extracts claims from the user's identity token and sends them as HTTP headers.
+Identity headers let your MCP server (and your backend) know who the end user is. Argide extracts claims from the user's identity token and sends them as HTTP headers.
 
 ### How Identity Flows Through the Chain
 
@@ -193,15 +193,15 @@ Identity headers let your MCP server (and your backend) know who the end user is
    ```json
    { "user_id": "user_456", "email": "alice@example.com", "tenant_id": "t_789" }
    ```
-2. Widget sends it to Ourguide with every chat message
-3. Ourguide decodes the JWT and has the claims available
-4. For each header mapping you configured, Ourguide resolves the value:
+2. Widget sends it to Argide with every chat message
+3. Argide decodes the JWT and has the claims available
+4. For each header mapping you configured, Argide resolves the value:
    ```
    identity.user_id   → "user_456"
    identity.email     → "alice@example.com"
    identity.tenant_id → "t_789"
    ```
-5. Ourguide sends these as HTTP headers to your MCP server:
+5. Argide sends these as HTTP headers to your MCP server:
    ```
    X-User-ID: user_456
    X-Email: alice@example.com
@@ -218,7 +218,7 @@ In the dashboard, under **Integration → Server-Side MCP → Header Mappings**,
 | `X-User-ID`   | `identity.user_id`     | The logged-in user's ID          |
 | `X-Email`     | `identity.email`       | The user's email                 |
 | `X-Tenant-ID` | `identity.tenant_id`   | Custom claim from your JWT       |
-| `X-Product-ID`| `product.id`           | The Ourguide product ID          |
+| `X-Product-ID`| `product.id`           | The Argide product ID          |
 
 ### Available Sources
 
@@ -235,7 +235,7 @@ In the dashboard, under **Integration → Server-Side MCP → Header Mappings**,
   Identity claims are only available for authenticated users. If the user hasn't been identified via [Identity Verification](/setup/identity-verification), identity headers won't be sent.
 </Note>
 
-**`product.*`** — Fields from the Ourguide product configuration:
+**`product.*`** — Fields from the Argide product configuration:
 
 | Source                      | Value                                 |
 | --------------------------- | ------------------------------------- |
@@ -249,7 +249,7 @@ In the dashboard, under **Integration → Server-Side MCP → Header Mappings**,
 from fastmcp.dependencies import Depends, CurrentHeaders
 
 async def get_user_id(headers: dict = CurrentHeaders()) -> str:
-    """Read user ID forwarded by Ourguide."""
+    """Read user ID forwarded by Argide."""
     return headers.get("x-user-id", "")
 
 @mcp.tool()
@@ -316,13 +316,13 @@ async def get_my_orders(
 What happens when a user asks "show me my orders":
 
 ```
-1. Widget → Ourguide:      identity_token (JWT with user_id: "user_456")
-2. Ourguide validates JWT, extracts user_id
-3. Ourguide → MCP server:  X-Service-Key: HCF8n..., X-User-ID: user_456
+1. Widget → Argide:      identity_token (JWT with user_id: "user_456")
+2. Argide validates JWT, extracts user_id
+3. Argide → MCP server:  X-Service-Key: HCF8n..., X-User-ID: user_456
 4. MCP server → Backend:   X-Service-Key: HCF8n..., X-User-ID: user_456
 5. Backend validates service key ✓, reads X-User-ID
 6. Backend queries orders for user_456
-7. Returns orders → MCP server → Ourguide → Widget → User sees their order list
+7. Returns orders → MCP server → Argide → Widget → User sees their order list
 ```
 
 ## Edge Cases
@@ -332,7 +332,7 @@ What happens when a user asks "show me my orders":
 | Anonymous user (no identity token) | Identity headers are not sent. Tools still work for non-user-specific actions.               |
 | Service key not set on product  | `X-Service-Key` header is not sent. Your MCP server won't be able to authenticate with your backend. |
 | Identity claim doesn't exist    | If a header mapping references a claim not in the JWT, that header is simply not sent. No error. |
-| MCP server is down              | Ourguide surfaces an error to the user: "Could not connect to the MCP server." The agent continues without those tools. |
+| MCP server is down              | Argide surfaces an error to the user: "Could not connect to the MCP server." The agent continues without those tools. |
 
 ## Security Checklist
 

@@ -3,14 +3,14 @@ title: "Multi-Language Support"
 description: "Make the AI respond in your user's language"
 ---
 
-Pass a `language` prop to the widget and Ourguide handles the rest — the AI responds in that language and the welcome message is translated automatically.
+Pass a `language` prop to the widget and Argide handles the rest — the AI responds in that language and the welcome message is translated automatically.
 
 **Example:** Your platform has users who speak Spanish, Japanese, and French. Set `language="es"` for Spanish users and the entire experience adapts — no prompt engineering needed.
 
 ## How It Works
 
 1. You pass a language code (ISO 639-1) when embedding the widget
-2. Ourguide translates the welcome message on the fly
+2. Argide translates the welcome message on the fly
 3. A language instruction is injected into the AI's system prompt
 4. The AI responds in the specified language for the entire conversation
 
@@ -24,22 +24,22 @@ Pass a `language` prop to the widget and Ourguide handles the rest — the AI re
 
 ```html Script Tag
 <script
-  src="https://dashboard.ourguide.ai/static/ourguide-widget.js"
-  data-api-url="https://dashboard.ourguide.ai"
+  src="https://dashboard.argide.ai/static/argide-widget.js"
+  data-api-url="https://dashboard.argide.ai"
   data-product-id="YOUR_PRODUCT_ID"
   data-language="es"
 ></script>
 ```
 
 ```jsx React SDK
-import { OurguideWidget } from "@ourguide/react";
+import { ArgideWidget } from "@argide/react";
 
 export default function App() {
   const language = user.locale || navigator.language.split('-')[0];
 
   return (
-    <OurguideWidget
-      apiUrl="https://dashboard.ourguide.ai"
+    <ArgideWidget
+      apiUrl="https://dashboard.argide.ai"
       productId="YOUR_PRODUCT_ID"
       language={language}
     />
@@ -66,7 +66,7 @@ You can set `language` dynamically based on the logged-in user's locale, browser
 
 ## Supported Languages
 
-Ourguide supports the following ISO 639-1 codes:
+Argide supports the following ISO 639-1 codes:
 
 | Code | Language    | Code | Language   | Code | Language    |
 | ---- | ----------- | ---- | ---------- | ---- | ----------- |

@@ -11,10 +11,10 @@ Use multi-subdomain endpoints when your backend serves multiple workspaces at di
 
 1. You configure subdomain → base URL + auth mappings
 2. When embedding the widget, pass a `subdomain` identifier
-3. Ourguide routes API calls to the matching base URL with the matching credentials
+3. Argide routes API calls to the matching base URL with the matching credentials
 
 <Info>
-  If no subdomain is passed, Ourguide falls back to the default base URL and auth config — fully backward compatible.
+  If no subdomain is passed, Argide falls back to the default base URL and auth config — fully backward compatible.
 </Info>
 
 ## Configure via Dashboard
@@ -37,7 +37,7 @@ For bulk setup, use the API to send all subdomain configs at once.
 Adds new subdomains and updates existing ones without removing any.
 
 ```bash
-curl -X PATCH https://api.ourguide.ai/api/products/YOUR_PRODUCT_ID/endpoint-configs \
+curl -X PATCH https://api.argide.ai/api/products/YOUR_PRODUCT_ID/endpoint-configs \
   -H "Content-Type: application/json" \
   -d '{
     "configs": {
@@ -75,7 +75,7 @@ Response:
 Replaces the entire config set. Any subdomain not included will be removed.
 
 ```bash
-curl -X PUT https://api.ourguide.ai/api/products/YOUR_PRODUCT_ID/endpoint-configs \
+curl -X PUT https://api.argide.ai/api/products/YOUR_PRODUCT_ID/endpoint-configs \
   -H "Content-Type: application/json" \
   -d '{
     "configs": {
@@ -92,7 +92,7 @@ curl -X PUT https://api.ourguide.ai/api/products/YOUR_PRODUCT_ID/endpoint-config
 Add or update a single subdomain:
 
 ```bash
-curl -X PUT https://api.ourguide.ai/api/products/YOUR_PRODUCT_ID/endpoint-configs/workspace1 \
+curl -X PUT https://api.argide.ai/api/products/YOUR_PRODUCT_ID/endpoint-configs/workspace1 \
   -H "Content-Type: application/json" \
   -d '{
     "api_base_url": "https://workspace1.app.com/api",
@@ -103,13 +103,13 @@ curl -X PUT https://api.ourguide.ai/api/products/YOUR_PRODUCT_ID/endpoint-config
 ### Delete Single
 
 ```bash
-curl -X DELETE https://api.ourguide.ai/api/products/YOUR_PRODUCT_ID/endpoint-configs/workspace1
+curl -X DELETE https://api.argide.ai/api/products/YOUR_PRODUCT_ID/endpoint-configs/workspace1
 ```
 
 ### List All
 
 ```bash
-curl https://api.ourguide.ai/api/products/YOUR_PRODUCT_ID/endpoint-configs
+curl https://api.argide.ai/api/products/YOUR_PRODUCT_ID/endpoint-configs
 ```
 
 <Note>
@@ -118,26 +118,26 @@ curl https://api.ourguide.ai/api/products/YOUR_PRODUCT_ID/endpoint-configs
 
 ## Pass Subdomain to Widget
 
-Tell the widget which subdomain to use so Ourguide routes API calls to the correct endpoint.
+Tell the widget which subdomain to use so Argide routes API calls to the correct endpoint.
 
 <CodeGroup>
 
 ```html Script Tag
 <script
-  src="https://dashboard.ourguide.ai/static/ourguide-widget.js"
-  data-api-url="https://dashboard.ourguide.ai"
+  src="https://dashboard.argide.ai/static/argide-widget.js"
+  data-api-url="https://dashboard.argide.ai"
   data-product-id="YOUR_PRODUCT_ID"
   data-subdomain="workspace1"
 ></script>
 ```
 
 ```jsx React SDK
-import { OurguideWidget } from "@ourguide/react";
+import { ArgideWidget } from "@argide/react";
 
 export default function App() {
   return (
-    <OurguideWidget
-      apiUrl="https://dashboard.ourguide.ai"
+    <ArgideWidget
+      apiUrl="https://dashboard.argide.ai"
       productId="YOUR_PRODUCT_ID"
       subdomain="workspace1"
     />

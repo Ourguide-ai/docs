@@ -5,7 +5,7 @@ description: "Get your agent live in 5 minutes"
 
 ## 1. Copy your script tag
 
-Go to [dashboard.ourguide.ai/dashboard/deploy/widget](https://dashboard.ourguide.ai/dashboard/deploy/widget) and copy your script tag.
+Go to [dashboard.argide.ai/dashboard/deploy/widget](https://dashboard.argide.ai/dashboard/deploy/widget) and copy your script tag.
 
 ## 2. Add to your site
 
@@ -13,21 +13,21 @@ Go to [dashboard.ourguide.ai/dashboard/deploy/widget](https://dashboard.ourguide
 
 ```html HTML
 <script
-  src="https://dashboard.ourguide.ai/ourguide-b2b-widget.iife.js"
-  data-api-url="https://dashboard.ourguide.ai"
+  src="https://dashboard.argide.ai/argide-b2b-widget.iife.js"
+  data-api-url="https://dashboard.argide.ai"
   data-product-id="YOUR_PRODUCT_ID"
 ></script>
 ```
 
 ```jsx React / Next.js
-import { OurguideWidget } from '@ourguide-ai/ui';
-import '@ourguide-ai/ui/styles.css';
+import { ArgideWidget } from '@argide/ui';
+import '@argide/ui/styles.css';
 
 
 export default function App() {
   return (
-    <OurguideWidget
-      apiUrl="https://dashboard.ourguide.ai"
+    <ArgideWidget
+      apiUrl="https://dashboard.argide.ai"
       productId="YOUR_PRODUCT_ID"
     />
   );
@@ -65,7 +65,7 @@ In [API Integration](/integration/api-integration), upload your OpenAPI spec, co
 
 ## Need Help?
 
-Running into issues or want our engineers to customize Ourguide for your use case?
+Running into issues or want our engineers to customize Argide for your use case?
 
 <Card title="Book a Demo" icon="calendar" href="https://cal.com/eshaangulati/30min">
   Talk to our team and get a personalized walkthrough.

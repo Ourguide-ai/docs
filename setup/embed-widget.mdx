@@ -1,6 +1,6 @@
 ---
 title: "Embed Widget"
-description: "Add the Ourguide widget to your website"
+description: "Add the Argide widget to your website"
 sidebarTitle: "Embed Widget"
 ---
 
@@ -15,8 +15,8 @@ Choose your preferred installation method:
     <CodeGroup>
       ```html HTML
       <script
-        src="https://dashboard.ourguide.ai/ourguide-b2b-widget.iife.js"
-        data-api-url="https://dashboard.ourguide.ai"
+        src="https://dashboard.argide.ai/argide-b2b-widget.iife.js"
+        data-api-url="https://dashboard.argide.ai"
         data-product-id="YOUR_PRODUCT_ID"
         data-agent-name="Your Agent Name"
       ></script>
@@ -30,8 +30,8 @@ Choose your preferred installation method:
           <>
             {children}
             <Script
-              src="https://dashboard.ourguide.ai/ourguide-b2b-widget.iife.js"
-              data-api-url="https://dashboard.ourguide.ai"
+              src="https://dashboard.argide.ai/argide-b2b-widget.iife.js"
+              data-api-url="https://dashboard.argide.ai"
               data-product-id="YOUR_PRODUCT_ID"
               data-agent-name="Your Agent Name"
               strategy="afterInteractive"
@@ -44,11 +44,11 @@ Choose your preferred installation method:
 
     | Attribute            | Required | Description                                                                                     |
     | -------------------- | -------- | ----------------------------------------------------------------------------------------------- |
-    | `data-api-url`       | Yes      | `https://api.ourguide.ai`                                                                       |
+    | `data-api-url`       | Yes      | `https://dashboard.argide.ai`                                                                       |
     | `data-product-id`    | Yes      | Your product ID from dashboard                                                                  |
     | `data-agent-name`    | No       | Display name (defaults to "Assistant")                                                          |                                                                 |
 
-    After the script loads, use `window.ourguide()` to pass functions and objects:
+    After the script loads, use `window.argide()` to pass functions and objects:
 
     | Command                    | Description                                                          |
     | -------------------------- | -------------------------------------------------------------------- |
@@ -65,21 +65,21 @@ Choose your preferred installation method:
     Install the SDK:
 
     ```bash
-    npm install @ourguide-ai/client @ourguide-ai/ui
+    npm install @argide/client @argide/ui
     ```
 
     Add to your app:
 
     ```tsx
 
-    import { OurguideWidget } from '@ourguide-ai/ui';
-    import '@ourguide-ai/ui/styles.css';
+    import { ArgideWidget } from '@argide/ui';
+    import '@argide/ui/styles.css';
 
-    export function OurguideWidgetClient() {
+    export function ArgideWidgetClient() {
       return (
-        <OurguideWidget
+        <ArgideWidget
           productId="YOUR_PRODUCT_ID"
-          apiUrl="https://dashboard.ourguide.ai"
+          apiUrl="https://dashboard.argide.ai"
           agentName="Your Agent Name"
         />
       );
@@ -89,7 +89,7 @@ Choose your preferred installation method:
     | Prop               | Required | Description                                                                                                       |
     | ------------------ | -------- | ----------------------------------------------------------------------------------------------------------------- |
     | `productId`        | Yes      | Your product ID from dashboard                                                                                    |
-    | `apiUrl`           | Yes      | `https://api.ourguide.ai`                                                                                         |
+    | `apiUrl`           | Yes      | `https://dashboard.argide.ai`                                                                                         |
     | `agentName`        | No       | Display name (defaults to "Assistant")                                                                            |
     | `getIdentityToken` | No       | Async function returning a JWT. Auto-refreshes on expiry. See [Identity Verification](/setup/identity-verification) |
     | `context`          | No       | Page context object sent with every message. Reactive — updates when the object changes                           |
@@ -98,25 +98,25 @@ Choose your preferred installation method:
     | `navigate`         | No       | SPA navigation function (e.g. `router.push`) for internal links                                                  |
 
     <Accordion title="Copilot Sidebar">
-      A full-height sidebar that automatically pushes your page content aside. Wrap your app with `OurguideProvider` and place `OurguideCopilot` alongside your app:
+      A full-height sidebar that automatically pushes your page content aside. Wrap your app with `ArgideProvider` and place `ArgideCopilot` alongside your app:
 
       ```bash
-      npm install @ourguide/client @ourguide/ui
+      npm install @argide/client @argide/ui
       ```
 
       ```tsx
-      import { OurguideProvider, OurguideCopilot } from '@ourguide/ui';
-      import '@ourguide-ai/ui/styles.css';
+      import { ArgideProvider, ArgideCopilot } from '@argide/ui';
+      import '@argide-ai/ui/styles.css';
 
       function App() {
         return (
-          <OurguideProvider
+          <ArgideProvider
             productId="YOUR_PRODUCT_ID"
-            apiUrl="https://dashboard.ourguide.in"
+            apiUrl="https://dashboard.argide.in"
           >
             <YourApp />
-            <OurguideCopilot position="right" width={400} />
-          </OurguideProvider>
+            <ArgideCopilot position="right" width={400} />
+          </ArgideProvider>
         );
       }
       ```
@@ -126,7 +126,7 @@ Choose your preferred installation method:
 
 ## Find Your Product ID
 
-1. Go to [dashboard.ourguide.ai/dashboard/deploy/widget](https://dashboard.ourguide.ai/dashboard/deploy/widget)
+1. Go to [dashboard.argide.ai/dashboard/deploy/widget](https://dashboard.argide.ai/dashboard/deploy/widget)
 2. Copy your Product ID
 
 ---
@@ -140,8 +140,8 @@ Authenticate users for persistent conversations and user-specific actions.
     **Option A — Auto-refresh (recommended).** Pass a function that fetches a JWT. The SDK calls it on mount and re-calls it automatically when the token expires (401):
 
     ```javascript
-    window.ourguide('setIdentityTokenFetcher', async () => {
-      const res = await fetch('/api/ourguide-token');
+    window.argide('setIdentityTokenFetcher', async () => {
+      const res = await fetch('/api/argide-token');
       const { token } = await res.json();
       return token;
     });
@@ -150,13 +150,13 @@ Authenticate users for persistent conversations and user-specific actions.
     **Option B — Manual.** Pass a static token (you handle refresh yourself):
 
     ```javascript
-    window.ourguide('identify', {
+    window.argide('identify', {
       token: 'jwt-from-your-backend',  // Required
       name: 'John Doe'                  // Optional
     })
 
     // On logout
-    window.ourguide('resetUser')
+    window.argide('resetUser')
     ```
   </Tab>
 
@@ -164,15 +164,15 @@ Authenticate users for persistent conversations and user-specific actions.
     Pass `getIdentityToken` — the SDK handles calling it on mount and auto-refreshing on expiry:
 
     ```tsx
-    import { OurguideWidget } from '@ourguide-ai/ui';
+    import { ArgideWidget } from '@argide-ai/ui';
 
     function App() {
       return (
-        <OurguideWidget
+        <ArgideWidget
           productId="YOUR_PRODUCT_ID"
-          apiUrl="https://api.ourguide.ai"
+          apiUrl="https://api.argide.ai"
           getIdentityToken={async () => {
-            const res = await fetch('/api/ourguide-token');
+            const res = await fetch('/api/argide-token');
             const { token } = await res.json();
             return token;
           }}
@@ -196,7 +196,7 @@ See [Client-Side Tools](/integration/client-side-tools) for full setup.
 <Tabs>
   <Tab title="Script Tag">
     ```javascript
-    window.ourguide('registerTools', {
+    window.argide('registerTools', {
       navigateToPage: async ({ path }) => {
         router.push(path)
         return { success: true }  // Agent sees this result
@@ -212,7 +212,7 @@ See [Client-Side Tools](/integration/client-side-tools) for full setup.
 
   <Tab title="React SDK">
     ```tsx
-    import { OurguideWidget } from '@ourguide-ai/ui';
+    import { ArgideWidget } from '@argide-ai/ui';
 
     function App() {
       const tools = {
@@ -228,9 +228,9 @@ See [Client-Side Tools](/integration/client-side-tools) for full setup.
       };
 
       return (
-        <OurguideWidget
+        <ArgideWidget
           productId="YOUR_PRODUCT_ID"
-          apiUrl="https://api.ourguide.ai"
+          apiUrl="https://api.argide.ai"
           tools={tools}
         />
       );
@@ -254,7 +254,7 @@ React to server-side tool completions — refresh data, show a diff UI, dispatch
 <Tabs>
   <Tab title="Script Tag">
     ```javascript
-    window.ourguide('onToolResult', (toolName, result) => {
+    window.argide('onToolResult', (toolName, result) => {
       if (toolName === 'propose_revision') {
         showDiffUI(result);
       }
@@ -264,7 +264,7 @@ React to server-side tool completions — refresh data, show a diff UI, dispatch
 
   <Tab title="React SDK">
     ```tsx
-    <OurguideWidget
+    <ArgideWidget
       onToolResult={(toolName, result) => {
         if (toolName === 'propose_revision') showDiffUI(result);
       }}
@@ -295,7 +295,7 @@ Your renderer receives `{ result, status }` and returns one of:
     Show key metrics with change indicators:
 
     ```javascript
-    window.ourguide('registerToolRenderers', {
+    window.argide('registerToolRenderers', {
       query_analytics_chart: ({ result }) => {
         const r = result || {};
         const color = r.changePercent > 0 ? '#059669' : '#ef4444';
@@ -319,7 +319,7 @@ Your renderer receives `{ result, status }` and returns one of:
     Display structured data in rows and columns:
 
     ```javascript
-    window.ourguide('registerToolRenderers', {
+    window.argide('registerToolRenderers', {
       query_data_table: ({ result }) => {
         const r = result || {};
         const headers = r.columns || [];
@@ -357,7 +357,7 @@ Your renderer receives `{ result, status }` and returns one of:
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
-    window.ourguide('registerToolRenderers', {
+    window.argide('registerToolRenderers', {
       query_analytics_chart: ({ result }) => {
         const canvas = document.createElement('canvas');
         canvas.style.width = '100%';
@@ -382,16 +382,16 @@ Your renderer receives `{ result, status }` and returns one of:
     ```
 
     <Warning>
-      **Timing:** `window.ourguide()` must be called **after** `ourguide-widget.js` has loaded. In plain HTML this happens naturally (scripts execute in order). In Next.js, use `onLoad`:
+      **Timing:** `window.argide()` must be called **after** `argide-widget.js` has loaded. In plain HTML this happens naturally (scripts execute in order). In Next.js, use `onLoad`:
 
       ```jsx
       <Script
-        src="https://api.ourguide.ai/static/ourguide-widget.js"
+        src="https://api.argide.ai/static/argide-widget.js"
         data-product-id="YOUR_PRODUCT_ID"
-        data-api-url="https://api.ourguide.ai"
+        data-api-url="https://api.argide.ai"
         strategy="afterInteractive"
         onLoad={() => {
-          window.ourguide('registerToolRenderers', { ... });
+          window.argide('registerToolRenderers', { ... });
         }}
       />
       ```
@@ -406,7 +406,7 @@ Your renderer receives `{ result, status }` and returns one of:
     React SDK renderers return **JSX** — full React components with hooks, state, and libraries like Recharts:
 
     ```tsx
-    <OurguideWidget
+    <ArgideWidget
       toolRenderers={{
         query_analytics_chart: ({ result }) => <MyChart data={result.data} />,
       }}
@@ -427,13 +427,13 @@ Some users find it more intuitive to read setup instructions in Q&A format. Here
     Install the SDK and drop in one component:
 
     ```bash
-    npm install @ourguide-ai/client @ourguide-ai/ui
+    npm install @argide-ai/client @argide-ai/ui
     ```
 
     ```tsx
-    <OurguideWidget
+    <ArgideWidget
       productId="YOUR_PRODUCT_ID"
-      apiUrl="https://dashboard.ourguide.ai"
+      apiUrl="https://dashboard.argide.ai"
     />
     ```
 
@@ -443,16 +443,16 @@ Some users find it more intuitive to read setup instructions in Q&A format. Here
   <Accordion title="How do I authenticate users?">
     Two steps:
 
-    1. **Create a backend endpoint** (~15 lines) that reads your existing session and mints a JWT signed with your Ourguide verification secret. Ourguide never sees your auth system — the JWT is the bridge.
+    1. **Create a backend endpoint** (~15 lines) that reads your existing session and mints a JWT signed with your Argide verification secret. Argide never sees your auth system — the JWT is the bridge.
 
     2. **Pass it as a prop:**
 
     ```tsx
-    <OurguideWidget
+    <ArgideWidget
       productId="YOUR_PRODUCT_ID"
-      apiUrl="https://dashboard.ourguide.ai"
+      apiUrl="https://dashboard.argide.ai"
       getIdentityToken={async () => {
-        const res = await fetch('/api/ourguide-token');
+        const res = await fetch('/api/argide-token');
         const { token } = await res.json();
         return token;
       }}
@@ -475,7 +475,7 @@ Some users find it more intuitive to read setup instructions in Q&A format. Here
       return match ? { itemId: match[1] } : {};
     }, [pathname]);
 
-    <OurguideWidget
+    <ArgideWidget
       ...
       context={context}
     />
@@ -488,7 +488,7 @@ Some users find it more intuitive to read setup instructions in Q&A format. Here
     Pass your router's push function:
 
     ```tsx
-    <OurguideWidget
+    <ArgideWidget
       ...
       navigate={(path) => router.push(path)}
     />
@@ -501,7 +501,7 @@ Some users find it more intuitive to read setup instructions in Q&A format. Here
     **React SDK** — use `onToolResult` and `toolRenderers` as props:
 
     ```tsx
-    <OurguideWidget
+    <ArgideWidget
       onToolResult={(toolName, result) => {
         if (toolName === 'propose_revision') showDiffUI(result);
       }}
@@ -511,14 +511,14 @@ Some users find it more intuitive to read setup instructions in Q&A format. Here
     />
     ```
 
-    **Script Tag** — use `window.ourguide()`:
+    **Script Tag** — use `window.argide()`:
 
     ```javascript
-    window.ourguide('onToolResult', (toolName, result) => {
+    window.argide('onToolResult', (toolName, result) => {
       if (toolName === 'propose_revision') showDiffUI(result);
     });
 
-    window.ourguide('registerToolRenderers', {
+    window.argide('registerToolRenderers', {
       query_chart: ({ result }) => `<div>${result.title}: ${result.value}</div>`,
     });
     ```
@@ -528,9 +528,9 @@ Some users find it more intuitive to read setup instructions in Q&A format. Here
     Everything is a prop on one component:
 
     ```tsx
-    <OurguideWidget
+    <ArgideWidget
       productId="..."
-      apiUrl="https://dashboard.ourguide.ai"
+      apiUrl="https://dashboard.argide.ai"
       getIdentityToken={fetchToken}
       navigate={(path) => router.push(path)}
       onToolResult={(name, result) => ...}

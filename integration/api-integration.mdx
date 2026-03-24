@@ -3,19 +3,19 @@ title: "API Integration"
 description: "Connect your REST API so the agent can take actions"
 ---
 
-API Integration lets your Ourguide agent call your backend to perform actions like checking order status, canceling subscriptions, or updating user profiles.
+API Integration lets your Argide agent call your backend to perform actions like checking order status, canceling subscriptions, or updating user profiles.
 
 ## How It Works
 
 1. You provide an **OpenAPI spec** describing your API endpoints
-2. Ourguide maps those endpoints to agent capabilities
+2. Argide maps those endpoints to agent capabilities
 3. When a user asks the agent to do something, it calls the appropriate endpoint
 
 ## Adding Your OpenAPI Spec
 
 1. Go to **API Integration** in your dashboard
 2. Upload your OpenAPI/Swagger spec (JSON or YAML)
-3. Ourguide will parse the spec and show available endpoints
+3. Argide will parse the spec and show available endpoints
 4. Select which endpoints the agent can access
 
 ```yaml Example OpenAPI Spec

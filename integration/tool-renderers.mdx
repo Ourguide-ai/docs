@@ -10,17 +10,17 @@ Tool renderers let you display custom UI — like charts, tables, or cards — d
 ```mermaid
 sequenceDiagram
     participant User
-    participant OurguideCopilot
-    participant OurguideBackend as Ourguide Backend
+    participant ArgideCopilot
+    participant ArgideBackend as Argide Backend
     participant YourAPI as Your API
 
-    User->>OurguideCopilot: "Show me my mention rate chart"
-    OurguideCopilot->>OurguideBackend: POST /chat/message
-    OurguideBackend->>YourAPI: POST /api/tools/analytics-chart
-    YourAPI-->>OurguideBackend: { chartType: "line", data: [...] }
-    OurguideBackend-->>OurguideCopilot: SSE tool_result
-    OurguideCopilot->>OurguideCopilot: toolRenderers["query_analytics_chart"]
-    OurguideCopilot->>User: Renders custom chart inline
+    User->>ArgideCopilot: "Show me my mention rate chart"
+    ArgideCopilot->>ArgideBackend: POST /chat/message
+    ArgideBackend->>YourAPI: POST /api/tools/analytics-chart
+    YourAPI-->>ArgideBackend: { chartType: "line", data: [...] }
+    ArgideBackend-->>ArgideCopilot: SSE tool_result
+    ArgideCopilot->>ArgideCopilot: toolRenderers["query_analytics_chart"]
+    ArgideCopilot->>User: Renders custom chart inline
 ```
 
 1. **Agent calls a tool** — The backend executes a server-side tool and returns structured data
@@ -52,14 +52,14 @@ function MyChart({ result }: { result: unknown; status: string }) {
 ### 2. Pass to the Widget
 
 ```tsx
-import { OurguideCopilot } from '@ourguide/react';
-import '@ourguide/react/styles.css';
+import { ArgideCopilot } from '@argide/react';
+import '@argide/react/styles.css';
 
 function App() {
   return (
-    <OurguideCopilot
+    <ArgideCopilot
       productId="YOUR_PRODUCT_ID"
-      apiUrl="https://api.ourguide.ai"
+      apiUrl="https://api.argide.ai"
       toolRenderers={{
         query_analytics_chart: MyChart,
         query_citation_chart: MyChart,
@@ -131,9 +131,9 @@ function AnalyticsChart({ result }: { result: unknown; status: string }) {
 }
 
 // Use the same renderer for multiple chart tools
-<OurguideCopilot
+<ArgideCopilot
   productId="YOUR_PRODUCT_ID"
-  apiUrl="https://api.ourguide.ai"
+  apiUrl="https://api.argide.ai"
   toolRenderers={{
     query_analytics_chart: AnalyticsChart,
     query_citation_chart: AnalyticsChart,
@@ -149,7 +149,7 @@ function AnalyticsChart({ result }: { result: unknown; status: string }) {
 Import the `ToolRenderers` type for type-safe renderer maps:
 
 ```tsx
-import type { ToolRenderers } from '@ourguide/react';
+import type { ToolRenderers } from '@argide/react';
 
 const renderers: ToolRenderers = {
   my_tool: ({ result, status }) => <MyComponent data={result} />,
