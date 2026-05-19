@@ -34,7 +34,7 @@ Go to [dashboard.argide.ai/dashboard/deploy/widget](https://dashboard.argide.ai/
 Add to your backend environment:
 
 ```bash
-ARGIDE_VERIFICATION_SECRET=your_secret_here
+ARGIDE_AUTH_SECRET=your_secret_here
 ```
 
 <Warning>
@@ -56,7 +56,7 @@ app.get('/api/argide-token', authMiddleware, (req, res) => {
       email: req.user.email,
       name: req.user.name,
     },
-    process.env.ARGIDE_VERIFICATION_SECRET,
+    process.env.ARGIDE_AUTH_SECRET,
     { algorithm: 'HS256' }
   );
   res.json({ token });
@@ -78,7 +78,7 @@ async def argide_token(request: Request):
             "email": user.email,
             "name": user.name,
         },
-        os.environ["ARGIDE_VERIFICATION_SECRET"],
+        os.environ["ARGIDE_AUTH_SECRET"],
         algorithm="HS256",
     )
     return {"token": token}
@@ -98,7 +98,7 @@ def argide_token():
             "email": current_user.email,
             "name": current_user.name,
         },
-        os.environ["ARGIDE_VERIFICATION_SECRET"],
+        os.environ["ARGIDE_AUTH_SECRET"],
         algorithm="HS256",
     )
     return {"token": token}
@@ -138,7 +138,7 @@ function App() {
 ```
 
 ```javascript Script Tag
-window.argide('setIdentityTokenFetcher', async () => {
+window.argide('identify', async () => {
   const res = await fetch('/api/argide-token');
   const { token } = await res.json();
   return token;
