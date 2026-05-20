@@ -52,7 +52,7 @@ Choose your preferred installation method:
 
     | Command                    | Description                                                          |
     | -------------------------- | -------------------------------------------------------------------- |
-    | `setIdentityTokenFetcher`  | Auto-refreshing JWT function. See [Identity](#user-identity)         |
+    | `identify`  | Auto-refreshing JWT function. See [Identity](#user-identity)         |
     | `setContext`               | Page context object. See [Context](#page-context)                    |
     | `onToolResult`             | Callback on tool completion. See [Callbacks](#tool-result-callbacks) |
     | `registerToolRenderers`    | Custom inline visuals. See [Renderers](#tool-renderers)              |
@@ -140,7 +140,7 @@ Authenticate users for persistent conversations and user-specific actions.
     **Option A — Auto-refresh (recommended).** Pass a function that fetches a JWT. The SDK calls it on mount and re-calls it automatically when the token expires (401):
 
     ```javascript
-    window.argide('setIdentityTokenFetcher', async () => {
+    window.argide('identify', async () => {
       const res = await fetch('/api/argide-token');
       const { token } = await res.json();
       return token;
