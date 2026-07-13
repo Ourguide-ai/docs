@@ -1,0 +1,192 @@
+---
+title: "Identity Verification"
+description: "Let the agent call your API on behalf of the signed-in user"
+---
+
+Identity verification proves to Argide who the user is, so the agent can call your API as that user — "show my orders", "cancel my subscription". Your backend mints a JWT, the widget passes it to Argide, and Argide forwards it to your API on every tool call.
+
+<Info>
+  If you only want the user's name on their conversations, you don't need any of this. See [User Identification](/setup/user-identification) — it needs no backend and no token.
+</Info>
+
+## How It Works
+
+1. User logs into **your** app
+2. Your backend mints an Argide identity token (JWT signed with your Argide secret)
+3. Your frontend calls `window.argide('identify', { token })`
+4. When the agent calls your API, Argide sends that token as `Authorization: Bearer <token>`
+5. Your API verifies it with the same secret and knows which user is asking
+
+<Info>
+  This is not your app's session JWT. It's a separate Argide-scoped identity token that your backend mints specifically for Argide. Your app JWT stays private.
+</Info>
+
+---
+
+## 1. Get Your Secret
+
+Go to [dashboard.argide.ai/dashboard/deploy/widget](https://dashboard.argide.ai/dashboard/deploy/widget) → copy **Verification Secret**.
+
+Add to your backend environment:
+
+```bash
+ARGIDE_AUTH_SECRET=your_secret_here
+```
+
+<Warning>
+  Never expose this secret in frontend code.
+</Warning>
+
+## 2. Create Backend Endpoint
+
+<CodeGroup>
+
+```javascript Node.js (Express)
+const jwt = require('jsonwebtoken');
+
+app.get('/api/argide-token', authMiddleware, (req, res) => {
+  const token = jwt.sign(
+    {
+      user_id: String(req.user.id),
+      exp: Math.floor(Date.now() / 1000) + 3600,
+      email: req.user.email,
+      name: req.user.name,
+    },
+    process.env.ARGIDE_AUTH_SECRET,
+    { algorithm: 'HS256' }
+  );
+  res.json({ token });
+});
+```
+
+```python Python (FastAPI)
+import jwt
+import time
+from fastapi import Request
+
+@app.get("/api/argide-token")
+async def argide_token(request: Request):
+    user = request.state.user
+    token = jwt.encode(
+        {
+            "user_id": str(user.id),
+            "exp": int(time.time()) + 3600,
+            "email": user.email,
+            "name": user.name,
+        },
+        os.environ["ARGIDE_AUTH_SECRET"],
+        algorithm="HS256",
+    )
+    return {"token": token}
+```
+
+```python Python (Flask)
+import jwt
+import time
+
+@app.route("/api/argide-token")
+@login_required
+def argide_token():
+    token = jwt.encode(
+        {
+            "user_id": str(current_user.id),
+            "exp": int(time.time()) + 3600,
+            "email": current_user.email,
+            "name": current_user.name,
+        },
+        os.environ["ARGIDE_AUTH_SECRET"],
+        algorithm="HS256",
+    )
+    return {"token": token}
+```
+
+</CodeGroup>
+
+### JWT Payload
+
+| Field     | Type   | Required | Description                                        |
+| --------- | ------ | -------- | -------------------------------------------------- |
+| `user_id` | string | Yes      | Unique user identifier — or send it as `sub`       |
+| `exp`     | number | Yes      | Expiration (Unix timestamp)                        |
+| `email`   | string | No       | User's email                                       |
+| `name`    | string | No       | Display name                                       |
+
+Sign the token with `HS256`. The `exp` claim is required — Argide rejects a token without one. The user identifier can be sent as `sub`, `userId`, or `user_id`; Argide takes the first one it finds, in that order.
+
+## 3. Identify in Frontend
+
+<CodeGroup>
+
+```jsx React SDK
+import { ArgideWidget } from '@argide/react-chat';
+
+function App() {
+  return (
+    <ArgideWidget
+      productId="YOUR_PRODUCT_ID"
+      apiUrl="https://api.argide.ai"
+      getIdentityToken={async () => {
+        const res = await fetch('/api/argide-token');
+        const { token } = await res.json();
+        return token;
+      }}
+    />
+  );
+}
+```
+
+```javascript Script Tag
+async function identifyToArgide() {
+  const res = await fetch('/api/argide-token');
+  const { token } = await res.json();
+  window.argide('identify', { token });
+}
+
+identifyToArgide();
+```
+
+</CodeGroup>
+
+Identify on every page load, not just after login — each new browser session needs the token.
+
+<Note>
+  Tokens expire. Re-mint before `exp` passes, or Argide has no valid token to forward and your API returns 401. With a one-hour token, refresh every 50 minutes:
+
+  ```javascript
+  setInterval(identifyToArgide, 50 * 60 * 1000);
+  ```
+</Note>
+
+## 4. Enable JWT Forward
+
+Turn on JWT Forward, or the token you pass is ignored.
+
+1. Open your product's API integration and select **JWT Forward** as the auth type
+2. Verify the token in your API with the same `ARGIDE_AUTH_SECRET`
+
+See [OpenAPI Authentication](/integration/openapi-auth) for the spec and the verification middleware.
+
+<Warning>
+  Without **JWT Forward** configured, `identify` succeeds silently and stores nothing. This is the most common reason identity appears to do nothing.
+</Warning>
+
+## 5. Handle Logout
+
+```javascript
+window.argide('resetAndClearSession');
+```
+
+This revokes the token you passed and starts a fresh, anonymous session. Call it yourself on logout — the widget does not do it for you when your app signs the user out.
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="OpenAPI Authentication" icon="key" href="/integration/openapi-auth">
+    Configure JWT Forward and verify the token
+  </Card>
+  <Card title="User Identification" icon="user" href="/setup/user-identification">
+    Name your users without a backend
+  </Card>
+</CardGroup>

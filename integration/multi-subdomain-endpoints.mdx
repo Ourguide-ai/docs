@@ -124,20 +124,20 @@ Tell the widget which subdomain to use so Argide routes API calls to the correct
 
 ```html Script Tag
 <script
-  src="https://dashboard.argide.ai/static/argide-widget.js"
-  data-api-url="https://dashboard.argide.ai"
+  src="https://dashboard.argide.ai/argide-b2b.iife.js"
+  data-api-url="https://api.argide.ai"
   data-product-id="YOUR_PRODUCT_ID"
   data-subdomain="workspace1"
 ></script>
 ```
 
 ```jsx React SDK
-import { ArgideWidget } from "@argide/react";
+import { ArgideWidget } from "@argide/react-chat";
 
 export default function App() {
   return (
     <ArgideWidget
-      apiUrl="https://dashboard.argide.ai"
+      apiUrl="https://api.argide.ai"
       productId="YOUR_PRODUCT_ID"
       subdomain="workspace1"
     />

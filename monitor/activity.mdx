@@ -21,6 +21,8 @@ View all conversations your agent has with users at [dashboard.argide.ai/dashboa
 
 ## Conversation Details
 
+Each conversation in the list is labelled with the user's name, or "Anonymous visitor" if you haven't identified them. See [User Identification](/setup/user-identification) to pass the name.
+
 ### Chat Tab
 
 Full conversation as users see it:
@@ -42,13 +44,24 @@ Tool calls appear inline with parameters and results:
 
 ### Details Tab
 
-| Field               | Description        |
-| ------------------- | ------------------ |
-| **Conversation ID** | Unique identifier  |
-| **Duration**        | Start to end time  |
-| **Messages**        | Total count        |
-| **Tokens**          | Usage              |
-| **Cost**            | Estimated (if enabled) |
+| Field                  | Description                                              |
+| ---------------------- | -------------------------------------------------------- |
+| **Name**               | The user's name, if you passed one                       |
+| **Email**              | The user's email, if you passed one                      |
+| **User ID**            | Your own ID for the user                                 |
+| **Custom attributes**  | Any extra attributes you sent — hidden when there are none |
+| **Session ID**         | The browser session the conversation belongs to          |
+| **Started**            | When the conversation began                              |
+
+Token usage and cost have their own **Cost** tab.
+
+The badge next to the user tells you where the identity came from:
+
+| Badge          | Meaning                                                                     |
+| -------------- | --------------------------------------------------------------------------- |
+| **Anonymous**  | You never identified this user                                              |
+| **Unverified** | Attributes came from `data-*` or `update` — taken on trust                  |
+| **Verified**   | Confirmed by a JWT via [Identity Verification](/integration/identity-verification) |
 
 ### Traces Tab
 

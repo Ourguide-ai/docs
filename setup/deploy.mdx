@@ -9,18 +9,18 @@ Go to [dashboard.argide.ai/dashboard/deploy/widget](https://dashboard.argide.ai/
 
 ```html
 <script
-  src="https://dashboard.argide.ai/argide-b2b-widget.iife.js"
-  data-api-url="https://dashboard.argide.ai"
+  src="https://dashboard.argide.ai/argide-b2b.iife.js"
+  data-api-url="https://api.argide.ai"
   data-product-id="YOUR_PRODUCT_ID"
 ></script>
 ```
 
-## Get Your Security Key
+## Get Your Verification Secret
 
-Same page — click the eye icon to reveal. Use this to sign JWTs for [Identity Verification](/setup/identity-verification).
+Same page — click the eye icon to reveal. Use this to sign JWTs for [Identity Verification](/integration/identity-verification).
 
 <Warning>
-  Keep your security key secret. Never expose in client-side code.
+  Keep your verification secret safe. Never expose it in client-side code.
 </Warning>
 
 ---
@@ -45,9 +45,10 @@ Same page — click the eye icon to reveal. Use this to sign JWTs for [Identity 
 
 ### Identity (if applicable)
 
-- [ ] JWT endpoint implemented
+- [ ] User attributes passed via `data-*` or `update`
+- [ ] JWT endpoint implemented, if the agent calls your API on the user's behalf
 - [ ] `identify()` called in frontend
-- [ ] `resetUser()` called on logout
+- [ ] `resetAndClearSession()` called on logout
 
 ---
 
