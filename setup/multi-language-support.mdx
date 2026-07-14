@@ -24,22 +24,22 @@ Pass a `language` prop to the widget and Argide handles the rest — the AI resp
 
 ```html Script Tag
 <script
-  src="https://dashboard.argide.ai/static/argide-widget.js"
-  data-api-url="https://dashboard.argide.ai"
+  src="https://dashboard.argide.ai/argide-b2b.iife.js"
+  data-api-url="https://api.argide.ai"
   data-product-id="YOUR_PRODUCT_ID"
   data-language="es"
 ></script>
 ```
 
 ```jsx React SDK
-import { ArgideWidget } from "@argide/react";
+import { ArgideWidget } from "@argide/react-chat";
 
 export default function App() {
   const language = user.locale || navigator.language.split('-')[0];
 
   return (
     <ArgideWidget
-      apiUrl="https://dashboard.argide.ai"
+      apiUrl="https://api.argide.ai"
       productId="YOUR_PRODUCT_ID"
       language={language}
     />

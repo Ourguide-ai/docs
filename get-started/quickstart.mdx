@@ -13,21 +13,21 @@ Go to [dashboard.argide.ai/dashboard/deploy/widget](https://dashboard.argide.ai/
 
 ```html HTML
 <script
-  src="https://dashboard.argide.ai/argide-b2b-widget.iife.js"
-  data-api-url="https://dashboard.argide.ai"
+  src="https://dashboard.argide.ai/argide-b2b.iife.js"
+  data-api-url="https://api.argide.ai"
   data-product-id="YOUR_PRODUCT_ID"
 ></script>
 ```
 
 ```jsx React / Next.js
-import { ArgideWidget } from '@argide/ui';
-import '@argide/ui/styles.css';
+import { ArgideWidget } from '@argide/react-chat';
+import '@argide/react-chat/styles.css';
 
 
 export default function App() {
   return (
     <ArgideWidget
-      apiUrl="https://dashboard.argide.ai"
+      apiUrl="https://api.argide.ai"
       productId="YOUR_PRODUCT_ID"
     />
   );
@@ -55,7 +55,7 @@ In [API Integration](/integration/api-integration), upload your OpenAPI spec, co
 ## Next Steps
 
 <CardGroup cols={2}>
-  <Card title="Identity Verification" icon="shield-halved" href="/setup/identity-verification">
+  <Card title="Identity Verification" icon="shield-halved" href="/integration/identity-verification">
     Authenticate users for personalized experiences
   </Card>
   <Card title="OpenAPI Authentication" icon="key" href="/integration/openapi-auth">

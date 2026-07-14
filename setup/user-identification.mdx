@@ -1,0 +1,176 @@
+---
+title: "User Identification"
+description: "Tell your agent who the end user is"
+---
+
+Identify the person chatting with your widget by passing their name, email, and your own user ID. Their conversations are then labelled with that name in [Activity](/monitor/activity) instead of showing up as anonymous.
+
+## How It Works
+
+1. You pass the user's attributes — on the `<script>` tag, or with the `update` command
+2. The widget stores them in `window.ArgideSettings` and sends them to Argide
+3. Every conversation from that browser is labelled with the user's name
+
+How you pass the attributes depends on how your site is built.
+
+---
+
+## Multi-Page Sites
+
+Add the attributes to your embed script. Every full page load re-sends the identity, so no JavaScript is needed.
+
+```html
+<script
+  src="https://dashboard.argide.ai/argide-b2b.iife.js"
+  data-api-url="https://api.argide.ai"
+  data-product-id="YOUR_PRODUCT_ID"
+  data-user-id="usr_8241"
+  data-name="Ada Lovelace"
+  data-email="ada@example.com"
+></script>
+```
+
+| Attribute        | Required | Description                                       |
+| ---------------- | -------- | ------------------------------------------------- |
+| `data-user-id`   | No       | Your own ID you use to identify this user         |
+| `data-name`      | No       | Display name, shown on the conversation           |
+| `data-email`     | No       | User's email                                      |
+| `data-visibility`| No       | Set to `"false"` to defer the widget. See [Visibility](/agent/visibility) |
+
+Render the values server-side from your session. Leave the attributes off for signed-out visitors — the widget still works, the conversation is just anonymous.
+
+### The Settings Object
+
+If you know the user before the widget loads, declare `window.ArgideSettings` **before** the script tag. It seeds the same attributes at boot, and takes precedence over the `data-*` attributes:
+
+```html
+<script>
+  window.ArgideSettings = {
+    user_id: 'usr_8241',
+    name: 'Ada Lovelace',
+    email: 'ada@example.com',
+  };
+</script>
+<script
+  src="https://dashboard.argide.ai/argide-b2b.iife.js"
+  data-api-url="https://api.argide.ai"
+  data-product-id="YOUR_PRODUCT_ID"
+></script>
+```
+
+`window.ArgideSettings` always holds the current attributes. The `update` command merges into it.
+
+---
+
+## Single-Page Apps
+
+A single-page app has no full page loads, so the script tag can't carry an identity that changes after login. Use the `update` command instead.
+
+```javascript
+// After the user signs in
+window.argide('update', {
+  user_id: 'usr_8241',
+  name: 'Ada Lovelace',
+  email: 'ada@example.com',
+});
+```
+
+### The `update` Command
+
+`window.argide('update', { ... })` changes the user's attributes at any time after the widget loads.
+
+| Property     | Type    | Description                                                              |
+| ------------ | ------- | ------------------------------------------------------------------------ |
+| `user_id`    | string  | Your own ID for this user                                                |
+| `name`       | string  | Display name                                                             |
+| `email`      | string  | User's email                                                             |
+| `visibility` | boolean | Show or hide the widget. See [Visibility](/agent/visibility)             |
+| *(any other key)* | any | Stored as a custom attribute                                            |
+
+<Note>
+  The property is `user_id` with an underscore — it matches the `data-user-id` attribute.
+</Note>
+
+An `update` **merges**. A property you pass replaces its current value, and a property you leave out keeps its current value. A partial update doesn't wipe attributes you set earlier:
+
+```javascript
+window.argide('update', { name: 'Ada Lovelace', email: 'ada@example.com' });
+
+// Later — email and name are preserved
+window.argide('update', { user_id: 'usr_8241' });
+```
+
+---
+
+## Custom Attributes
+
+Any property other than `user_id`, `name`, `email`, and `visibility` is stored as a custom attribute and shown on the conversation in [Activity](/monitor/activity):
+
+```javascript
+window.argide('update', {
+  user_id: 'usr_8241',
+  plan: 'enterprise',
+  seats: 25,
+  signed_up_at: '2024-03-11',
+});
+```
+
+Custom attributes merge key by key, so sending `{ plan: 'pro' }` later updates `plan` and leaves `seats` alone.
+
+<Note>
+  Custom attributes work with `window.ArgideSettings` and the `update` command only. The `data-*` attributes carry just `user_id`, `name`, `email`, and `visibility`.
+</Note>
+
+---
+
+## Verified vs Unverified
+
+There are two kinds of identity, and the same user can have both:
+
+| | Unverified | Verified |
+| --- | --- | --- |
+| How you send it | `data-*`, `ArgideSettings`, or `update` | `window.argide('identify', { token })` |
+| Setup needed | None | Backend endpoint that mints a JWT |
+| Name on conversations | Yes | Yes |
+| Agent can call your API as the user | No | Yes |
+| Badge in Activity | **Unverified** | **Verified** |
+
+<Warning>
+  Unverified attributes are taken on trust. Anyone who reads your page source can send any name, email, or user ID they like, so treat them as labels for your own dashboard — never as proof of who someone is.
+</Warning>
+
+If you want the agent to take actions on the user's behalf against your API, use [Identity Verification](/integration/identity-verification).
+
+A verified user keeps the **Verified** badge — an `update` can never take it away. The attributes themselves are still overwritable, so don't treat a verified name or email as tamper-proof.
+
+---
+
+## Handle Logout
+
+Clear the identity when the user signs out, so the next person on the same browser starts fresh:
+
+```javascript
+window.argide('resetAndClearSession');
+```
+
+| Command                   | What it does                                                                          |
+| ------------------------- | -------------------------------------------------------------------------------------- |
+| `resetAndClearSession`    | Starts a new session — the conversation and messages are cleared, and the next chat is anonymous |
+| `resetAndPreserveSession` | Revokes the JWT you passed to `identify`, but keeps the user's attributes and the conversation on screen — not a full logout |
+
+<Note>
+  `window.argide('resetUser')` still works as an alias for `resetAndPreserveSession`, but it is deprecated and logs a console warning. Use the two commands above.
+</Note>
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Visibility" icon="eye" href="/agent/visibility">
+    Show the widget only to signed-in users
+  </Card>
+  <Card title="Identity Verification" icon="shield-halved" href="/integration/identity-verification">
+    Let the agent act on the user's behalf
+  </Card>
+</CardGroup>

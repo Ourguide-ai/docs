@@ -66,7 +66,7 @@ function ChatScreen() {
 | Prop            | Required | Description                                                    |
 | --------------- | -------- | -------------------------------------------------------------- |
 | `productId`     | Yes      | Your product ID from the dashboard                             |
-| `apiUrl`        | No       | API URL (defaults to `https://dashboard.argide.ai`)         |
+| `apiUrl`        | No       | API URL (defaults to `https://api.argide.ai`)         |
 | `storage`       | No       | Storage adapter for persistence. Defaults to in-memory         |
 | `identityToken` | No       | JWT token for authenticated users                              |
 | `userName`      | No       | Display name for identified users                              |
@@ -206,7 +206,7 @@ Or pass the token via props:
 >
 ```
 
-See [Identity Verification](/setup/identity-verification) for generating tokens on your backend.
+See [Identity Verification](/integration/identity-verification) for generating tokens on your backend.
 
 ## Client-Side Tools
 
@@ -359,16 +359,16 @@ const styles = StyleSheet.create({
 
 ## Differences from Web SDK
 
-| Feature              | Web (`@argide/ui`)              | React Native (`@argide/react-native`)  |
+| Feature              | Web (`@argide/react-chat`)              | React Native (`@argide/react-native`)  |
 | -------------------- | --------------------------------- | ---------------------------------------- |
 | UI                   | Pre-built widget/copilot          | You build your own native UI             |
 | Streaming            | Automatic                         | Handled internally by SDK                |
 | Storage              | localStorage (automatic)          | AsyncStorage adapter                     |
 | Browser tools        | `whatsOnScreen`, `refresh`        | Register your own native tools           |
-| Provider             | `ArgideProvider` from `@argide/ui` | `ArgideProvider` from `@argide/react-native` |
+| Provider             | `ArgideProvider` from `@argide/react-chat` | `ArgideProvider` from `@argide/react-native` |
 
 <CardGroup cols={2}>
-  <Card title="Identity Verification" icon="shield-halved" href="/setup/identity-verification">
+  <Card title="Identity Verification" icon="shield-halved" href="/integration/identity-verification">
     Generate JWT tokens on your backend
   </Card>
   <Card title="Client-Side Tools" icon="wrench" href="/integration/client-side-tools">

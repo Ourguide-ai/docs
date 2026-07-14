@@ -52,8 +52,8 @@ function MyChart({ result }: { result: unknown; status: string }) {
 ### 2. Pass to the Widget
 
 ```tsx
-import { ArgideCopilot } from '@argide/react';
-import '@argide/react/styles.css';
+import { ArgideCopilot } from '@argide/react-chat';
+import '@argide/react-chat/styles.css';
 
 function App() {
   return (
@@ -149,7 +149,7 @@ function AnalyticsChart({ result }: { result: unknown; status: string }) {
 Import the `ToolRenderers` type for type-safe renderer maps:
 
 ```tsx
-import type { ToolRenderers } from '@argide/react';
+import type { ToolRenderers } from '@argide/react-chat';
 
 const renderers: ToolRenderers = {
   my_tool: ({ result, status }) => <MyComponent data={result} />,

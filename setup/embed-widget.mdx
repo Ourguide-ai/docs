@@ -15,10 +15,9 @@ Choose your preferred installation method:
     <CodeGroup>
       ```html HTML
       <script
-        src="https://dashboard.argide.ai/argide-b2b-widget.iife.js"
-        data-api-url="https://dashboard.argide.ai"
+        src="https://dashboard.argide.ai/argide-b2b.iife.js"
+        data-api-url="https://api.argide.ai"
         data-product-id="YOUR_PRODUCT_ID"
-        data-agent-name="Your Agent Name"
       ></script>
       ```
 
@@ -30,10 +29,9 @@ Choose your preferred installation method:
           <>
             {children}
             <Script
-              src="https://dashboard.argide.ai/argide-b2b-widget.iife.js"
-              data-api-url="https://dashboard.argide.ai"
+              src="https://dashboard.argide.ai/argide-b2b.iife.js"
+              data-api-url="https://api.argide.ai"
               data-product-id="YOUR_PRODUCT_ID"
-              data-agent-name="Your Agent Name"
               strategy="afterInteractive"
             />
           </>
@@ -42,56 +40,60 @@ Choose your preferred installation method:
       ```
     </CodeGroup>
 
-    | Attribute            | Required | Description                                                                                     |
-    | -------------------- | -------- | ----------------------------------------------------------------------------------------------- |
-    | `data-api-url`       | Yes      | `https://dashboard.argide.ai`                                                                       |
-    | `data-product-id`    | Yes      | Your product ID from dashboard                                                                  |
-    | `data-agent-name`    | No       | Display name (defaults to "Assistant")                                                          |                                                                 |
+    | Attribute          | Required | Description                                                                    |
+    | ------------------ | -------- | ------------------------------------------------------------------------------ |
+    | `data-product-id`  | Yes      | Your product ID from dashboard                                                 |
+    | `data-api-url`     | No       | Defaults to `https://api.argide.ai`                                            |
+    | `data-user-id`     | No       | Your own ID for the user. See [User Identification](/setup/user-identification) |
+    | `data-name`        | No       | The user's name. See [User Identification](/setup/user-identification)          |
+    | `data-email`       | No       | The user's email. See [User Identification](/setup/user-identification)         |
+    | `data-visibility`  | No       | Set to `"false"` to defer the widget. See [Visibility](/agent/visibility)       |
+
+    The agent's display name comes from your dashboard settings, not from the script tag.
 
     After the script loads, use `window.argide()` to pass functions and objects:
 
-    | Command                    | Description                                                          |
-    | -------------------------- | -------------------------------------------------------------------- |
-    | `identify`  | Auto-refreshing JWT function. See [Identity](#user-identity)         |
-    | `setContext`               | Page context object. See [Context](#page-context)                    |
-    | `onToolResult`             | Callback on tool completion. See [Callbacks](#tool-result-callbacks) |
-    | `registerToolRenderers`    | Custom inline visuals. See [Renderers](#tool-renderers)              |
-    | `identify`                 | Manual JWT token (alternative to fetcher)                            |
-    | `registerTools`            | Client-side tool handlers                                            |
-            |
+    | Command                    | Description                                                                     |
+    | -------------------------- | ------------------------------------------------------------------------------- |
+    | `update`                   | User attributes and visibility. See [Identity](#user-identity)                   |
+    | `identify`                 | JWT token for authenticated API calls. See [Identity](#user-identity)            |
+    | `registerTools`            | Client-side tool handlers                                                       |
+    | `setNavigate`              | SPA navigation function for internal links (widget mode only)                   |
+    | `resetAndClearSession`     | Clear the identity, conversation, and session — use on logout                    |
+    | `resetAndPreserveSession`  | Clear the identity but keep the current conversation                            |
   </Tab>
 
   <Tab title="React SDK">
     Install the SDK:
 
     ```bash
-    npm install @argide/client @argide/ui
+    npm install @argide/react-chat
     ```
 
     Add to your app:
 
     ```tsx
 
-    import { ArgideWidget } from '@argide/ui';
-    import '@argide/ui/styles.css';
+    import { ArgideWidget } from '@argide/react-chat';
+    import '@argide/react-chat/styles.css';
 
     export function ArgideWidgetClient() {
       return (
         <ArgideWidget
           productId="YOUR_PRODUCT_ID"
-          apiUrl="https://dashboard.argide.ai"
-          agentName="Your Agent Name"
+          apiUrl="https://api.argide.ai"
         />
       );
     }
     ```
 
+    The agent's display name comes from your dashboard settings.
+
     | Prop               | Required | Description                                                                                                       |
     | ------------------ | -------- | ----------------------------------------------------------------------------------------------------------------- |
     | `productId`        | Yes      | Your product ID from dashboard                                                                                    |
-    | `apiUrl`           | Yes      | `https://dashboard.argide.ai`                                                                                         |
-    | `agentName`        | No       | Display name (defaults to "Assistant")                                                                            |
-    | `getIdentityToken` | No       | Async function returning a JWT. Auto-refreshes on expiry. See [Identity Verification](/setup/identity-verification) |
+    | `apiUrl`           | Yes      | `https://api.argide.ai`                                                                                         |
+    | `getIdentityToken` | No       | Async function returning a JWT. Called on mount — the SDK does not re-call it when the token expires. See [Identity Verification](/integration/identity-verification) |
     | `context`          | No       | Page context object sent with every message. Reactive — updates when the object changes                           |
     | `toolRenderers`    | No       | Map of tool name → React component for inline rendering. See [Tool Renderers](/integration/tool-renderers)        |
     | `onToolResult`     | No       | Callback `(toolName, result) => void` fired when a server-side tool completes                                     |
@@ -101,18 +103,18 @@ Choose your preferred installation method:
       A full-height sidebar that automatically pushes your page content aside. Wrap your app with `ArgideProvider` and place `ArgideCopilot` alongside your app:
 
       ```bash
-      npm install @argide/client @argide/ui
+      npm install @argide/react-chat
       ```
 
       ```tsx
-      import { ArgideProvider, ArgideCopilot } from '@argide/ui';
-      import '@argide-ai/ui/styles.css';
+      import { ArgideProvider, ArgideCopilot } from '@argide/react-chat';
+      import '@argide/react-chat/styles.css';
 
       function App() {
         return (
           <ArgideProvider
             productId="YOUR_PRODUCT_ID"
-            apiUrl="https://dashboard.argide.in"
+            apiUrl="https://api.argide.ai"
           >
             <YourApp />
             <ArgideCopilot position="right" width={400} />
@@ -133,57 +135,38 @@ Choose your preferred installation method:
 
 ## User Identity
 
-Authenticate users for persistent conversations and user-specific actions.
+There are two ways to tell the agent who the user is. Pick based on what you need.
 
-<Tabs>
-  <Tab title="Script Tag">
-    **Option A — Auto-refresh (recommended).** Pass a function that fetches a JWT. The SDK calls it on mount and re-calls it automatically when the token expires (401):
+| You want                                          | Use                | Backend needed |
+| ------------------------------------------------- | ------------------ | -------------- |
+| The user's name on their conversations            | `data-*` or `update` | No             |
+| The agent to call your API on the user's behalf   | `identify`         | Yes            |
 
-    ```javascript
-    window.argide('identify', async () => {
-      const res = await fetch('/api/argide-token');
-      const { token } = await res.json();
-      return token;
-    });
-    ```
+**Attributes** — pass the user on the script tag, or with the `update` command in a single-page app:
 
-    **Option B — Manual.** Pass a static token (you handle refresh yourself):
+```javascript
+window.argide('update', {
+  user_id: 'usr_8241',
+  name: 'Ada Lovelace',
+  email: 'ada@example.com',
+});
+```
 
-    ```javascript
-    window.argide('identify', {
-      token: 'jwt-from-your-backend',  // Required
-      name: 'John Doe'                  // Optional
-    })
+See [User Identification](/setup/user-identification) for the full set of attributes, custom attributes, and single-page app setup.
 
-    // On logout
-    window.argide('resetUser')
-    ```
-  </Tab>
+**JWT** — mint a token on your backend and pass it, so Argide can forward it to your API:
 
-  <Tab title="React SDK">
-    Pass `getIdentityToken` — the SDK handles calling it on mount and auto-refreshing on expiry:
+```javascript
+window.argide('identify', { token: 'jwt-from-your-backend' });
+```
 
-    ```tsx
-    import { ArgideWidget } from '@argide-ai/ui';
+See [Identity Verification](/integration/identity-verification) for the backend JWT setup.
 
-    function App() {
-      return (
-        <ArgideWidget
-          productId="YOUR_PRODUCT_ID"
-          apiUrl="https://api.argide.ai"
-          getIdentityToken={async () => {
-            const res = await fetch('/api/argide-token');
-            const { token } = await res.json();
-            return token;
-          }}
-        />
-      );
-    }
-    ```
-  </Tab>
-</Tabs>
+On logout, clear the identity:
 
-See [Identity Verification](/setup/identity-verification) for backend JWT setup.
+```javascript
+window.argide('resetAndClearSession');
+```
 
 ---
 
@@ -212,7 +195,7 @@ See [Client-Side Tools](/integration/client-side-tools) for full setup.
 
   <Tab title="React SDK">
     ```tsx
-    import { ArgideWidget } from '@argide-ai/ui';
+    import { ArgideWidget } from '@argide/react-chat';
 
     function App() {
       const tools = {
@@ -382,11 +365,11 @@ Your renderer receives `{ result, status }` and returns one of:
     ```
 
     <Warning>
-      **Timing:** `window.argide()` must be called **after** `argide-widget.js` has loaded. In plain HTML this happens naturally (scripts execute in order). In Next.js, use `onLoad`:
+      **Timing:** `window.argide()` must be called **after** the Argide script has loaded. In plain HTML this happens naturally (scripts execute in order). In Next.js, use `onLoad`:
 
       ```jsx
       <Script
-        src="https://api.argide.ai/static/argide-widget.js"
+        src="https://dashboard.argide.ai/argide-b2b.iife.js"
         data-product-id="YOUR_PRODUCT_ID"
         data-api-url="https://api.argide.ai"
         strategy="afterInteractive"
@@ -415,133 +398,6 @@ Your renderer receives `{ result, status }` and returns one of:
     ```
   </Tab>
 </Tabs>
-
----
-
-## Quick Q&A
-
-Some users find it more intuitive to read setup instructions in Q&A format. Here's everything above as quick answers:
-
-<AccordionGroup>
-  <Accordion title="How do I add the chat to my app?">
-    Install the SDK and drop in one component:
-
-    ```bash
-    npm install @argide-ai/client @argide-ai/ui
-    ```
-
-    ```tsx
-    <ArgideWidget
-      productId="YOUR_PRODUCT_ID"
-      apiUrl="https://dashboard.argide.ai"
-    />
-    ```
-
-    That's it. Chat works anonymously out of the box. No provider wrapping needed.
-  </Accordion>
-
-  <Accordion title="How do I authenticate users?">
-    Two steps:
-
-    1. **Create a backend endpoint** (~15 lines) that reads your existing session and mints a JWT signed with your Argide verification secret. Argide never sees your auth system — the JWT is the bridge.
-
-    2. **Pass it as a prop:**
-
-    ```tsx
-    <ArgideWidget
-      productId="YOUR_PRODUCT_ID"
-      apiUrl="https://dashboard.argide.ai"
-      getIdentityToken={async () => {
-        const res = await fetch('/api/argide-token');
-        const { token } = await res.json();
-        return token;
-      }}
-    />
-    ```
-
-    The SDK calls this on mount and auto-refreshes when the token expires. No `useEffect`, no `setInterval`, no manual calls.
-
-    This enables: conversation history, personalized responses, and user-specific tool actions.
-
-    See [Identity Verification](/setup/identity-verification) for the backend JWT setup.
-  </Accordion>
-
-  <Accordion title="How do I give the AI context about the current page?">
-    Pass a `context` object. It's reactive — when it changes (e.g., user navigates), the AI automatically knows.
-
-    ```tsx
-    const context = useMemo(() => {
-      const match = pathname.match(/\/items\/([^/]+)/);
-      return match ? { itemId: match[1] } : {};
-    }, [pathname]);
-
-    <ArgideWidget
-      ...
-      context={context}
-    />
-    ```
-
-    This gets injected into the AI's system prompt so it can perform page-aware actions like "edit this item" without asking which one.
-  </Accordion>
-
-  <Accordion title="How do I handle SPA navigation for links?">
-    Pass your router's push function:
-
-    ```tsx
-    <ArgideWidget
-      ...
-      navigate={(path) => router.push(path)}
-    />
-    ```
-
-    Internal links the AI returns will use your SPA router instead of a full page reload.
-  </Accordion>
-
-  <Accordion title="How do I react when the AI calls a tool?">
-    **React SDK** — use `onToolResult` and `toolRenderers` as props:
-
-    ```tsx
-    <ArgideWidget
-      onToolResult={(toolName, result) => {
-        if (toolName === 'propose_revision') showDiffUI(result);
-      }}
-      toolRenderers={{
-        query_chart: ({ result }) => <MyChart data={result.data} />,
-      }}
-    />
-    ```
-
-    **Script Tag** — use `window.argide()`:
-
-    ```javascript
-    window.argide('onToolResult', (toolName, result) => {
-      if (toolName === 'propose_revision') showDiffUI(result);
-    });
-
-    window.argide('registerToolRenderers', {
-      query_chart: ({ result }) => `<div>${result.title}: ${result.value}</div>`,
-    });
-    ```
-  </Accordion>
-
-  <Accordion title="What does the full setup look like?">
-    Everything is a prop on one component:
-
-    ```tsx
-    <ArgideWidget
-      productId="..."
-      apiUrl="https://dashboard.argide.ai"
-      getIdentityToken={fetchToken}
-      navigate={(path) => router.push(path)}
-      onToolResult={(name, result) => ...}
-      toolRenderers={{ ... }}
-
-    />
-    ```
-
-    No providers, no initializers, no polling.
-  </Accordion>
-</AccordionGroup>
 
 ---
 

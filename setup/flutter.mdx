@@ -23,7 +23,7 @@ import 'package:flutter/material.dart';
 void main() => runApp(
   const ArgideScope(
     productId: 'YOUR_PRODUCT_ID',
-    apiUrl:'https://dashboard.argide.ai',
+    apiUrl:'https://api.argide.ai',
     child: MyApp(),
   ),
 );
@@ -160,7 +160,7 @@ ArgideScope(
 notifier.resetUser();
 ```
 
-See [Identity Verification](/setup/identity-verification) for generating tokens on your backend.
+See [Identity Verification](/integration/identity-verification) for generating tokens on your backend.
 
 ## Client-Side Tools
 
@@ -206,7 +206,7 @@ No additional configuration needed. For macOS apps, add the outbound networking 
 
 ## Differences from Other SDKs
 
-| Feature    | Web (`@argide/ui`)    | React Native              | Flutter                      |
+| Feature    | Web (`@argide/react-chat`)    | React Native              | Flutter                      |
 | ---------- | ----------------------- | ------------------------- | ---------------------------- |
 | Language   | TypeScript              | TypeScript                | Dart                         |
 | Drop-in UI | `<ArgideWidget />`    | `<ArgideWidget />`      | `ArgideWidget`             |
@@ -215,7 +215,7 @@ No additional configuration needed. For macOS apps, add the outbound networking 
 | Provider   | `<ArgideProvider>`    | `<ArgideProvider>`      | `ArgideScope`              |
 
 <CardGroup cols={2}>
-  <Card title="Identity Verification" icon="shield-halved" href="/setup/identity-verification">
+  <Card title="Identity Verification" icon="shield-halved" href="/integration/identity-verification">
     Generate JWT tokens on your backend
   </Card>
   <Card title="Client-Side Tools" icon="wrench" href="/integration/client-side-tools">
