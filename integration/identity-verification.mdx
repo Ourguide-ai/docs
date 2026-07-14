@@ -60,6 +60,7 @@ app.get('/api/argide-token', authMiddleware, (req, res) => {
 ```
 
 ```python Python (FastAPI)
+import os
 import jwt
 import time
 from fastapi import Request
@@ -81,6 +82,7 @@ async def argide_token(request: Request):
 ```
 
 ```python Python (Flask)
+import os
 import jwt
 import time
 
@@ -137,9 +139,14 @@ function App() {
 
 ```javascript Script Tag
 async function identifyToArgide() {
-  const res = await fetch('/api/argide-token');
-  const { token } = await res.json();
-  window.argide('identify', { token });
+  try {
+    const res = await fetch('/api/argide-token');
+    if (!res.ok) throw new Error(`Token request failed: ${res.status}`);
+    const { token } = await res.json();
+    window.argide('identify', { token });
+  } catch (err) {
+    console.error('Argide identify failed', err);
+  }
 }
 
 identifyToArgide();
@@ -149,13 +156,47 @@ identifyToArgide();
 
 Identify on every page load, not just after login — each new browser session needs the token.
 
-<Note>
-  Tokens expire. Re-mint before `exp` passes, or Argide has no valid token to forward and your API returns 401. With a one-hour token, refresh every 50 minutes:
+### Keep the Token Fresh
 
-  ```javascript
-  setInterval(identifyToArgide, 50 * 60 * 1000);
-  ```
-</Note>
+Tokens expire, so you need to make sure the token sent to Argide is kept fresh. Re-mint before `exp` passes, or Argide has no valid token to forward and your API returns 401. With a one-hour token, refresh every 50 minutes.
+
+<CodeGroup>
+
+```jsx React SDK
+import { useCallback, useEffect, useState } from 'react';
+
+function App() {
+  const [tick, setTick] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => setTick((t) => t + 1), 50 * 60 * 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  // The SDK calls getIdentityToken on mount and again whenever the function
+  // reference changes, so bumping `tick` is what triggers a re-mint.
+  const getIdentityToken = useCallback(async () => {
+    const res = await fetch('/api/argide-token');
+    if (!res.ok) throw new Error(`Token request failed: ${res.status}`);
+    const { token } = await res.json();
+    return token;
+  }, [tick]);
+
+  return (
+    <ArgideWidget
+      productId="YOUR_PRODUCT_ID"
+      apiUrl="https://api.argide.ai"
+      getIdentityToken={getIdentityToken}
+    />
+  );
+}
+```
+
+```javascript Script Tag
+setInterval(identifyToArgide, 50 * 60 * 1000);
+```
+
+</CodeGroup>
 
 ## 4. Enable JWT Forward
 

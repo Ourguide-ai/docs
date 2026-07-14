@@ -54,28 +54,6 @@ window.argide('update', {
 });
 ```
 
-To keep the widget hidden until the user signs in, add `data-visibility="false"` to the script tag and reveal it in the same `update` call:
-
-```html
-<script
-  src="https://dashboard.argide.ai/argide-b2b.iife.js"
-  data-api-url="https://api.argide.ai"
-  data-product-id="YOUR_PRODUCT_ID"
-  data-visibility="false"
-></script>
-```
-
-```javascript
-window.argide('update', {
-  visibility: true,
-  user_id: 'usr_8241',
-  name: 'Ada Lovelace',
-  email: 'ada@example.com',
-});
-```
-
-See [Visibility](/agent/visibility) for the full behaviour of `data-visibility` and the `visibility` property.
-
 ### The Settings Object
 
 If you know the user before the widget loads, declare `window.ArgideSettings` **before** the script tag. It seeds the same attributes at boot, and takes precedence over the `data-*` attributes:
@@ -115,7 +93,7 @@ If you know the user before the widget loads, declare `window.ArgideSettings` **
   The property is `user_id` with an underscore — it matches the `data-user-id` attribute.
 </Note>
 
-An `update` **merges**. A property you pass replaces its current value, and a property you leave out keeps its current value. A partial update can never wipe attributes you set earlier:
+An `update` **merges**. A property you pass replaces its current value, and a property you leave out keeps its current value. A partial update doesn't wipe attributes you set earlier:
 
 ```javascript
 window.argide('update', { name: 'Ada Lovelace', email: 'ada@example.com' });
@@ -124,7 +102,6 @@ window.argide('update', { name: 'Ada Lovelace', email: 'ada@example.com' });
 window.argide('update', { user_id: 'usr_8241' });
 ```
 
-`visibility` is the exception: it only affects the widget in the browser and is never sent to Argide.
 
 ### Custom Attributes
 

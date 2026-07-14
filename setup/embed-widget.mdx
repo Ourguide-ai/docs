@@ -82,18 +82,18 @@ Choose your preferred installation method:
         <ArgideWidget
           productId="YOUR_PRODUCT_ID"
           apiUrl="https://api.argide.ai"
-          agentName="Your Agent Name"
         />
       );
     }
     ```
 
+    The agent's display name comes from your dashboard settings.
+
     | Prop               | Required | Description                                                                                                       |
     | ------------------ | -------- | ----------------------------------------------------------------------------------------------------------------- |
     | `productId`        | Yes      | Your product ID from dashboard                                                                                    |
     | `apiUrl`           | Yes      | `https://api.argide.ai`                                                                                         |
-    | `agentName`        | No       | Display name (defaults to "Assistant")                                                                            |
-    | `getIdentityToken` | No       | Async function returning a JWT. See [Identity Verification](/integration/identity-verification) |
+    | `getIdentityToken` | No       | Async function returning a JWT. Called on mount — the SDK does not re-call it when the token expires. See [Identity Verification](/integration/identity-verification) |
     | `context`          | No       | Page context object sent with every message. Reactive — updates when the object changes                           |
     | `toolRenderers`    | No       | Map of tool name → React component for inline rendering. See [Tool Renderers](/integration/tool-renderers)        |
     | `onToolResult`     | No       | Callback `(toolName, result) => void` fired when a server-side tool completes                                     |

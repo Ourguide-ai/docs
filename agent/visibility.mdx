@@ -20,7 +20,7 @@ Add `data-visibility="false"` to your embed script:
 
 The widget does not appear and does not connect: no launcher button, no conversation, no chat session. The script still loads, so the widget is ready to appear the moment you reveal it.
 
-<Note>
+<Warning>
   The script loads asynchronously, so `window.argide()` may not exist yet when your page code runs. To queue commands safely, add this line **before** the script tag:
 
   ```html
@@ -28,11 +28,9 @@ The widget does not appear and does not connect: no launcher button, no conversa
   ```
 
   You can then call `window.argide.push(['update', { visibility: true }])` at any time, and the command runs as soon as the widget is ready.
-</Note>
 
-<Note>
   Only the exact value `"false"` hides the widget. Any other value — and leaving the attribute off entirely — shows it. So a missing attribute always means visible, and the default embed code keeps working unchanged.
-</Note>
+</Warning>
 
 ---
 
@@ -89,15 +87,11 @@ See [User Identification](/setup/user-identification) for the attributes you can
 
 ## Reference
 
-| Attribute         | Description                                        | Default   |
-| ----------------- | -------------------------------------------------- | --------- |
-| `data-visibility` | Set to `"false"` to keep the widget hidden on load | Visible   |
+| Attribute         | Description                                        | If omitted        |
+| ----------------- | -------------------------------------------------- | ----------------- |
+| `data-visibility` | Set to `"false"` to keep the widget hidden on load | Widget is visible |
 
-| Property     | Description                          | Default |
-| ------------ | ------------------------------------ | ------- |
-| `visibility` | `true` shows the widget, `false` hides it | `true`  |
-
-You can also set `visibility` in `window.ArgideSettings` before the script loads. It takes precedence over `data-visibility`.
+You can also set `visibility` in `window.ArgideSettings` before the script loads.
 
 ---
 
