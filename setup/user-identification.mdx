@@ -39,21 +39,6 @@ Add the attributes to your embed script. Every full page load re-sends the ident
 
 Render the values server-side from your session. Leave the attributes off for signed-out visitors — the widget still works, the conversation is just anonymous.
 
----
-
-## Single-Page Apps
-
-A single-page app has no full page loads, so the script tag can't carry an identity that changes after login. Use the `update` command instead.
-
-```javascript
-// After the user signs in
-window.argide('update', {
-  user_id: 'usr_8241',
-  name: 'Ada Lovelace',
-  email: 'ada@example.com',
-});
-```
-
 ### The Settings Object
 
 If you know the user before the widget loads, declare `window.ArgideSettings` **before** the script tag. It seeds the same attributes at boot, and takes precedence over the `data-*` attributes:
@@ -77,7 +62,20 @@ If you know the user before the widget loads, declare `window.ArgideSettings` **
 
 ---
 
-## The `update` Command
+## Single-Page Apps
+
+A single-page app has no full page loads, so the script tag can't carry an identity that changes after login. Use the `update` command instead.
+
+```javascript
+// After the user signs in
+window.argide('update', {
+  user_id: 'usr_8241',
+  name: 'Ada Lovelace',
+  email: 'ada@example.com',
+});
+```
+
+### The `update` Command
 
 `window.argide('update', { ... })` changes the user's attributes at any time after the widget loads.
 
@@ -102,8 +100,9 @@ window.argide('update', { name: 'Ada Lovelace', email: 'ada@example.com' });
 window.argide('update', { user_id: 'usr_8241' });
 ```
 
+---
 
-### Custom Attributes
+## Custom Attributes
 
 Any property other than `user_id`, `name`, `email`, and `visibility` is stored as a custom attribute and shown on the conversation in [Activity](/monitor/activity):
 
