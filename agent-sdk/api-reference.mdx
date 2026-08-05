@@ -20,7 +20,7 @@ Initializes the page's runtime. Idempotent and safe under React StrictMode — c
 | `claim` | `({ sessionId, pairingCode }) => Promise<void>` | No | Called only when a session is freshly minted — never on recovery. Exchange the pair for a claim via your server. Omit to claim through [your own channel](/agent-sdk/claiming-sessions#custom-path-your-own-channel). |
 | `onStateChange` | `(state) => void` | No | Reports the facade lifecycle: `"starting" \| "ready" \| "error" \| "stopped"` |
 
-## ArgideAgent.do({ goal })
+## ArgideAgent.do(\{ goal \})
 
 Starts a task, or rejoins the running one.
 
@@ -28,14 +28,14 @@ Starts a task, or rejoins the running one.
 - Rejects with `409 SESSION_BUSY` when called with a *different* goal while a task is running.
 - Called with the *same* goal as the running task, it resolves with the same `taskId` (rejoin).
 
-## ArgideAgent.check({ taskId })
+## ArgideAgent.check(\{ taskId \})
 
 Fetches the authoritative outcome.
 
 - Returns `Promise<{ taskId, status, summary }>`.
 - Rejects on any non-2xx, including `404` for a task that is unknown or belongs to another session.
 
-## ArgideAgent.cancel({ taskId })
+## ArgideAgent.cancel(\{ taskId \})
 
 Ends the task early.
 
