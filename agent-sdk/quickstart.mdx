@@ -3,4 +3,146 @@ title: "Quickstart"
 description: "Run your first agent task in about 15 minutes"
 ---
 
-Documentation for the Agent SDK is being written.
+Integrate `@argide/agent` end to end: install the package, initialize it in the browser, add the server-side claim endpoint, and run your first task.
+
+## Before you start
+
+You need:
+
+- Your Product ID and an `ak_live_...` API key from your [dashboard](https://dashboard.argide.ai).
+- A backend that can keep the API key secret and expose one new endpoint.
+
+## 1. Install
+
+<CodeGroup>
+
+```bash npm
+npm install @argide/agent
+```
+
+```bash pnpm
+pnpm add @argide/agent
+```
+
+```bash yarn
+yarn add @argide/agent
+```
+
+</CodeGroup>
+
+## 2. Initialize in the browser
+
+Call `init` once, wherever your page boots. It is idempotent and safe under React StrictMode — call it from anywhere, any number of times.
+
+```ts
+import { ArgideAgent } from "@argide/agent";
+
+ArgideAgent.init({
+  apiUrl: "https://<your-argide-api-host>",
+  productId: "YOUR_PRODUCT_ID",
+  // Called only when a session is freshly minted — never on recovery.
+  claim: async ({ sessionId, pairingCode }) => {
+    const res = await fetch("/api/argide/claim", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sessionId, pairingCode }),
+    });
+    if (!res.ok) throw new Error(`claim failed: HTTP ${res.status}`);
+  },
+});
+```
+
+<Note>
+  On the server (SSR), `init` warns and does nothing. No session is minted until it runs in a real browser.
+</Note>
+
+## 3. Add the claim endpoint on your server
+
+The `claim` callback above posts the session's `{ sessionId, pairingCode }` pair to your backend. Your backend exchanges the pair for a claim using your `ak_live_...` key — until that happens, the session can't run tasks.
+
+Create the endpoint the callback calls:
+
+<CodeGroup>
+
+```ts Next.js — app/api/argide/claim/route.ts
+import { NextResponse } from "next/server";
+
+export async function POST(req: Request) {
+  const { sessionId, pairingCode } = await req.json();
+  if (
+    typeof sessionId !== "string" || !sessionId ||
+    typeof pairingCode !== "string" || !pairingCode
+  ) {
+    return NextResponse.json(
+      { error: "sessionId and pairingCode are required strings" },
+      { status: 400 },
+    );
+  }
+
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_ARGIDE_AGENT_API_URL}/api/agent/v1/sessions/claim`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.ARGIDE_AGENT_API_KEY}`,
+      },
+      body: JSON.stringify({ sessionId, pairingCode }),
+      cache: "no-store",
+    },
+  );
+  return new NextResponse(await res.text(), {
+    status: res.status,
+    headers: { "Content-Type": "application/json" },
+  });
+}
+```
+
+</CodeGroup>
+
+Set the environment variables:
+
+```bash .env.local
+NEXT_PUBLIC_ARGIDE_AGENT_API_URL=https://<your-argide-api-host>
+ARGIDE_AGENT_API_KEY=ak_live_...
+```
+
+<Warning>
+  The `ak_live_...` key must never ship to the browser. Keep it in server-side environment variables only.
+</Warning>
+
+Any backend works — the endpoint just forwards the pair to `POST {apiUrl}/api/agent/v1/sessions/claim` with an `Authorization: Bearer ak_live_...` header. See [Claiming Sessions](/agent-sdk/claiming-sessions) for the raw HTTP contract.
+
+## 4. Run a task
+
+```ts
+const { taskId } = await ArgideAgent.do({ goal: "cancel my subscription" });
+
+const outcome = await ArgideAgent.check({ taskId });
+// { taskId, status, summary }
+```
+
+`do()` resolves as soon as the task exists — not when it finishes — and waits internally for init and the claim to complete first, so you never have to check "is it ready".
+
+## 5. Watch it work (optional)
+
+```ts
+const off = ArgideAgent.onActivity((activity) => {
+  // { kind: "tool-start" | "tool-end" | "idle", ... }
+  console.log(activity);
+});
+```
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Claiming Sessions" icon="key" href="/agent-sdk/claiming-sessions">
+    The security model behind the pairing-code exchange
+  </Card>
+  <Card title="Running Tasks" icon="play" href="/agent-sdk/running-tasks">
+    Task lifecycle, busy sessions, and error handling
+  </Card>
+  <Card title="API Reference" icon="book" href="/agent-sdk/api-reference">
+    Every method, option, and error code
+  </Card>
+</CardGroup>
