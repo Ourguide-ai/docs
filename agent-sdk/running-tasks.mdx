@@ -3,4 +3,78 @@ title: "Running Tasks"
 description: "Start, monitor, cancel, and recover agent tasks"
 ---
 
-Documentation for the Agent SDK is being written.
+A task is one goal handed to the agent. This page covers the full lifecycle: starting a task, the one-goal-at-a-time rule, reading the outcome, cancelling, and what happens when the agent navigates the page out from under itself.
+
+## Start a task
+
+```ts
+const { taskId } = await ArgideAgent.do({ goal: "cancel my subscription" });
+```
+
+`do()` resolves as soon as the task exists — not when it finishes. It also waits internally for `init` and the claim to complete, so you can call it right after `init` with no readiness check.
+
+## One goal at a time
+
+Each session runs at most one task. What `do()` does while a task is running depends on the goal:
+
+| While a task is running... | Result |
+| -------------------------- | ------ |
+| `do()` with a **different** goal | Rejects with `409 SESSION_BUSY`. Wait for the task to settle, or `cancel()` it first. |
+| `do()` with the **same** goal | Treated as a rejoin — resolves with the same `taskId`. |
+
+<Tip>
+  The same-goal rejoin is what makes re-dispatching after a hard navigation safe: fire the same `do()` again after a reload and you re-attach to the running task instead of erroring.
+</Tip>
+
+## Read the outcome
+
+```ts
+const outcome = await ArgideAgent.check({ taskId });
+// { taskId, status, summary }
+```
+
+`check()` is the authoritative source for how a task ended. Activity events (below) are ephemeral and per-tab; when you need to decide what actually happened, use `check()`.
+
+## End a task early
+
+```ts
+await ArgideAgent.cancel({ taskId });
+```
+
+## Handle errors
+
+`check()` and `cancel()` reject on any non-2xx response — wrap them:
+
+```ts
+try {
+  await ArgideAgent.cancel({ taskId });
+} catch (err) {
+  // 404 — unknown task, or a task belonging to another session
+  // 409 — the task is already terminal
+}
+```
+
+## Watch progress
+
+Three signals, three jobs:
+
+| Signal | What it tells you | Use it for |
+| ------ | ----------------- | ---------- |
+| `onActivity(cb)` | Ephemeral, per-tab events as the agent works: `{ kind: "tool-start" \| "tool-end" \| "idle", ... }` | Live "agent is working" UI |
+| `onStateChange` (an `init` option) | Facade lifecycle: `"starting" \| "ready" \| "error" \| "stopped"` | Enabling or disabling your entry points |
+| `check({ taskId })` | The authoritative task outcome | Deciding what happened |
+
+```ts
+const off = ArgideAgent.onActivity((activity) => {
+  setSpinner(activity.kind !== "idle");
+});
+// later, to unsubscribe: off()
+```
+
+## Surviving hard navigations
+
+The agent may navigate the tab as part of a task. When that happens:
+
+1. The SDK recovers the existing session on load — no new claim is needed.
+2. Still-pending tool dispatches are replayed over the reconnect. Your stack must tolerate seeing them again — see [integration requirements](/agent-sdk/overview#integration-requirements).
+3. Re-sending the same goal with `do()` re-attaches to the running task and resolves with the same `taskId`.
