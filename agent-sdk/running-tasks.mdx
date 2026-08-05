@@ -33,6 +33,8 @@ const outcome = await ArgideAgent.check({ taskId });
 // { taskId, status, summary }
 ```
 
+`status` is one of `running`, `completed`, `failed`, or `cancelled`; `summary` is a string or `null`.
+
 `check()` is the authoritative source for how a task ended. Activity events (below) are ephemeral and per-tab; when you need to decide what actually happened, use `check()`.
 
 ## End a task early
@@ -43,14 +45,19 @@ await ArgideAgent.cancel({ taskId });
 
 ## Handle errors
 
-`check()` and `cancel()` reject on any non-2xx response — wrap them:
+`check()` and `cancel()` reject on any non-2xx response. The rejection is a plain `Error` — there's no `.status` or `.code` property to branch on — but its message carries the HTTP status, so inspect the message:
 
 ```ts
 try {
   await ArgideAgent.cancel({ taskId });
 } catch (err) {
-  // 404 — unknown task, or a task belonging to another session
-  // 409 — the task is already terminal
+  const message = err instanceof Error ? err.message : String(err);
+  // e.g. "agent task cancel failed: HTTP 404" or "agent task cancel failed: HTTP 409"
+  if (message.includes("HTTP 404")) {
+    // unknown task, or a task belonging to another session
+  } else if (message.includes("HTTP 409")) {
+    // the task is already terminal
+  }
 }
 ```
 
@@ -66,7 +73,8 @@ Three signals, three jobs:
 
 ```ts
 const off = ArgideAgent.onActivity((activity) => {
-  setSpinner(activity.kind !== "idle");
+  // { kind: "tool-start" | "tool-end" | "idle", ... }
+  console.log(activity);
 });
 // later, to unsubscribe: off()
 ```

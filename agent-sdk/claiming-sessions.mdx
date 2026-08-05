@@ -15,7 +15,7 @@ stateDiagram-v2
     Recovered --> Recovered: further reloads
 ```
 
-- **Minted** — `init()` created a new session and produced `{ sessionId, pairingCode }`. Tasks are refused.
+- **Minted** — `init()` created a new session and produced `{ sessionId, pairingCode }`. `do()` queues until the claim lands; an unclaimed session's tasks are refused by the server.
 - **Claimed** — your server exchanged the pair for a claim. Tasks run.
 - **Recovered** — after a reload or hard navigation, the SDK re-attaches to the existing session. It is already claimed; no new pairing code is issued.
 

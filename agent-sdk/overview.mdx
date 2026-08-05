@@ -36,7 +36,7 @@ sequenceDiagram
 
 ## Security model
 
-- **The browser never holds your API key.** The `ak_live_...` key lives on your server; the tab only ever sees a short-lived pairing code.
+- **The browser never holds your API key.** The `ak_live_...` key lives on your server; the tab only ever sees a single-use pairing code.
 - **Unclaimed sessions can't act.** Tasks are refused until your server has claimed the session.
 - **A pairing code is exchanged once.** Re-claiming an already-claimed session returns `409 ALREADY_CLAIMED` — reserved as the signal that a stolen code is being replayed.
 
@@ -44,7 +44,7 @@ sequenceDiagram
 
 ## Integration requirements
 
-- **Client-side tool execution.** Your stack must be able to execute tools in the browser — see [Client-Side Tools](/integration/client-side-tools).
+- **Client-side tool execution.** Your stack must be able to execute tools in the browser.
 - **Reconnect replay tolerance.** After a hard navigation, still-pending tool dispatches are replayed over the reconnect; your handlers must tolerate seeing them again.
 
 ## Get started

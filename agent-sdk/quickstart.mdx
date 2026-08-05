@@ -10,6 +10,7 @@ Integrate `@argide/agent` end to end: install the package, initialize it in the 
 You need:
 
 - Your Product ID and an `ak_live_...` API key from your [dashboard](https://dashboard.argide.ai).
+- Your API host (`apiUrl`) from the same dashboard, e.g. `https://<your-argide-api-host>`.
 - A backend that can keep the API key secret and expose one new endpoint.
 
 ## 1. Install
@@ -38,8 +39,8 @@ Call `init` once, wherever your page boots. It is idempotent and safe under Reac
 import { ArgideAgent } from "@argide/agent";
 
 ArgideAgent.init({
-  apiUrl: "https://<your-argide-api-host>",
-  productId: "YOUR_PRODUCT_ID",
+  apiUrl: process.env.NEXT_PUBLIC_ARGIDE_AGENT_API_URL!,
+  productId: process.env.NEXT_PUBLIC_ARGIDE_AGENT_PRODUCT_ID!,
   // Called only when a session is freshly minted — never on recovery.
   claim: async ({ sessionId, pairingCode }) => {
     const res = await fetch("/api/argide/claim", {
@@ -68,6 +69,15 @@ Create the endpoint the callback calls:
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
+  const apiUrl = process.env.NEXT_PUBLIC_ARGIDE_AGENT_API_URL;
+  const apiKey = process.env.ARGIDE_AGENT_API_KEY;
+  if (!apiUrl || !apiKey) {
+    return NextResponse.json(
+      { error: "Set NEXT_PUBLIC_ARGIDE_AGENT_API_URL and ARGIDE_AGENT_API_KEY" },
+      { status: 500 },
+    );
+  }
+
   const { sessionId, pairingCode } = await req.json();
   if (
     typeof sessionId !== "string" || !sessionId ||
@@ -80,12 +90,12 @@ export async function POST(req: Request) {
   }
 
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_ARGIDE_AGENT_API_URL}/api/agent/v1/sessions/claim`,
+    `${apiUrl}/api/agent/v1/sessions/claim`,
     {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.ARGIDE_AGENT_API_KEY}`,
+        Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({ sessionId, pairingCode }),
       cache: "no-store",
@@ -104,11 +114,16 @@ Set the environment variables:
 
 ```bash .env.local
 NEXT_PUBLIC_ARGIDE_AGENT_API_URL=https://<your-argide-api-host>
+NEXT_PUBLIC_ARGIDE_AGENT_PRODUCT_ID=YOUR_PRODUCT_ID
 ARGIDE_AGENT_API_KEY=ak_live_...
 ```
 
 <Warning>
   The `ak_live_...` key must never ship to the browser. Keep it in server-side environment variables only.
+</Warning>
+
+<Warning>
+  This route spends your API key. Gate it behind your own authenticated user session and rate-limit it — anyone who can load your page can obtain a pairing code and call it.
 </Warning>
 
 Any backend works — the endpoint just forwards the pair to `POST {apiUrl}/api/agent/v1/sessions/claim` with an `Authorization: Bearer ak_live_...` header. See [Claiming Sessions](/agent-sdk/claiming-sessions) for the raw HTTP contract.
@@ -121,6 +136,8 @@ const { taskId } = await ArgideAgent.do({ goal: "cancel my subscription" });
 const outcome = await ArgideAgent.check({ taskId });
 // { taskId, status, summary }
 ```
+
+`status` is one of `running`, `completed`, `failed`, or `cancelled`; `summary` is a string or `null`.
 
 `do()` resolves as soon as the task exists — not when it finishes — and waits internally for init and the claim to complete first, so you never have to check "is it ready".
 

@@ -32,14 +32,14 @@ Starts a task, or rejoins the running one.
 
 Fetches the authoritative outcome.
 
-- Returns `Promise<{ taskId, status, summary }>`.
+- Returns `Promise<{ taskId, status, summary }>`. `status` is one of `running`, `completed`, `failed`, or `cancelled`; `summary` is a string or `null`.
 - Rejects on any non-2xx, including `404` for a task that is unknown or belongs to another session.
 
 ## ArgideAgent.cancel(\{ taskId \})
 
 Ends the task early.
 
-- The returned promise settles when the cancel completes.
+- The returned promise resolves with the same `{ taskId, status, summary }` outcome shape as `check()`.
 - Rejects on any non-2xx, including `404` (unknown or foreign task) and `409` (task already terminal).
 
 ## ArgideAgent.onActivity(callback)
@@ -61,6 +61,12 @@ Returns `Promise<{ sessionId, pairingCode, recovered }>` for claiming through yo
 
 Claim only when `recovered` is `false` — a recovered session is already claimed, and re-claiming returns `409 ALREADY_CLAIMED`. See [Claiming Sessions](/agent-sdk/claiming-sessions).
 
+## ArgideAgent.stop()
+
+Tears down and resets the runtime. The next `init()` starts fresh. Normal pages never call this — the runtime is designed to live as long as the tab.
+
+- Local teardown only: it leaves a running task alive server-side. Use `cancel()` to end the task.
+
 ## Errors
 
 | Error | Status | Surfaces from | What it means |
@@ -69,6 +75,8 @@ Claim only when `recovered` is `false` — a recovered session is already claime
 | `ALREADY_CLAIMED` | 409 | the claim endpoint | The session was already claimed. Reserved as the stolen-pairing-code signal — do not retry. |
 | Not found | 404 | `check()`, `cancel()` | Unknown `taskId`, or a task belonging to another session. |
 | Conflict | 409 | `cancel()` | The task is already terminal. |
+
+These codes describe server-side behavior. On the client, `do()`, `check()`, and `cancel()` reject with a plain `Error` whose message carries the HTTP status (e.g. `agent task create failed: HTTP 409`) — the codes themselves aren't exposed as properties on the error.
 
 ## startAgentRuntime
 
