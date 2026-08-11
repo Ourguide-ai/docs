@@ -10,8 +10,25 @@ Integrate `@ourguide-ai/agent` end to end: install the package, initialize it in
 You need:
 
 - Access to the package on GitHub Packages, and a token configured — see [Installation](/agent-sdk/installation).
-- Your Product ID and an `ak_live_...` API key from your [dashboard](https://dashboard.argide.ai).
+- A **Product ID** and an `ak_live_...` **agent API key** — see below.
 - A backend that can keep the API key secret and expose one new endpoint.
+
+### Get your agent API key
+
+The agent API key is separate from the widget's secret key, and it lives under **Settings**, not **Deploy**.
+
+1. In the [dashboard](https://dashboard.argide.ai), go to **Settings → Agent API**.
+2. Turn on **Enable the agent API**. Tasks are refused while it is off.
+3. Under **API keys**, click **Create key**.
+4. Copy the key immediately — it is shown once and cannot be retrieved again. If you lose it, revoke it and create another.
+
+<Note>
+  Only an organization admin can create or revoke agent API keys. If you are a member, the action fails.
+</Note>
+
+### Get your Product ID
+
+Go to **Settings → Products** and copy the **Product ID** of the product you are integrating.
 
 ## 1. Install
 
