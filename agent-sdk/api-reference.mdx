@@ -15,7 +15,7 @@ Initializes the page's runtime. Idempotent and safe under React StrictMode — c
 
 | Option | Type | Required | Description |
 | ------ | ---- | -------- | ----------- |
-| `apiUrl` | `string` | Yes | Your Argide API host, e.g. `https://<your-argide-api-host>` |
+| `apiUrl` | `string` | Yes | Your Argide API host, e.g. `https://api.argide.ai` |
 | `productId` | `string` | Yes | The product this page belongs to |
 | `claim` | `({ sessionId, pairingCode }) => Promise<void>` | No | Called only when a session is freshly minted — never on recovery. Exchange the pair for a claim via your server. Omit to claim through [your own channel](/agent-sdk/claiming-sessions#custom-path-your-own-channel). |
 | `onStateChange` | `(state) => void` | No | Reports the facade lifecycle: `"starting" \| "ready" \| "error" \| "stopped"` |
