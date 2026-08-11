@@ -78,11 +78,3 @@ const off = ArgideAgent.onActivity((activity) => {
 });
 // later, to unsubscribe: off()
 ```
-
-## Surviving hard navigations
-
-The agent may navigate the tab as part of a task. When that happens:
-
-1. The SDK recovers the existing session on load — no new claim is needed.
-2. Still-pending tool dispatches are replayed over the reconnect. Your stack must tolerate seeing them again — see [integration requirements](/agent-sdk/overview#integration-requirements).
-3. Re-sending the same goal with `do()` re-attaches to the running task and resolves with the same `taskId`.
