@@ -1,10 +1,10 @@
 ---
 title: "API Reference"
-description: "Every method, option, type, and error in @argide/agent"
+description: "Every method, option, type, and error in @ourguide-ai/agent"
 ---
 
 ```ts
-import { ArgideAgent, startAgentRuntime } from "@argide/agent";
+import { ArgideAgent, startAgentRuntime } from "@ourguide-ai/agent";
 ```
 
 `ArgideAgent` is a facade that owns one runtime per page — it is what most integrations use. [`startAgentRuntime`](#startagentruntime) is the lower-level primitive it wraps.
@@ -83,7 +83,7 @@ These codes describe server-side behavior. On the client, `do()`, `check()`, and
 `ArgideAgent` owns one runtime per page. Drop down to the primitive it wraps when you need more than one product on a page, or you want to manage the lifecycle yourself:
 
 ```ts
-import { startAgentRuntime } from "@argide/agent";
+import { startAgentRuntime } from "@ourguide-ai/agent";
 
 const argide = await startAgentRuntime({ apiUrl, productId });
 // argide.{ sessionId, pairingCode, recovered, do, check, cancel, onActivity, stop }

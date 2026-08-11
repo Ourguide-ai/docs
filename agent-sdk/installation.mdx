@@ -1,0 +1,81 @@
+---
+title: "Installation"
+description: "Get access to the Agent SDK on GitHub Packages and install it"
+---
+
+`@ourguide-ai/agent` is published to **GitHub Packages** as a restricted package. Every install is authenticated — there is no anonymous access, even to read. Complete these four steps once per project, plus once for every environment that builds your app.
+
+<Note>
+  Already have access and a token configured? Skip to the [quickstart](/agent-sdk/quickstart).
+</Note>
+
+## 1. Request package access
+
+Ask Argide to grant your GitHub account read access to the package. Nothing below works until that is done — an account without access gets a `404`, not a permission error.
+
+Contact [support@argide.com](mailto:support@argide.com) with the GitHub username or organization that needs access.
+
+## 2. Create a personal access token
+
+Create a **classic** personal access token with the `read:packages` scope at [github.com/settings/tokens](https://github.com/settings/tokens).
+
+<Warning>
+  GitHub Packages does not accept fine-grained tokens. It must be a classic token, or authentication fails.
+</Warning>
+
+## 3. Point the scope at GitHub Packages
+
+Add an `.npmrc` to your project root:
+
+```bash .npmrc
+@ourguide-ai:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
+```
+
+This routes only the `@ourguide-ai` scope to GitHub Packages. Every other dependency still comes from the public npm registry.
+
+<Note>
+  npm, pnpm, and Yarn Classic all read `.npmrc`. Yarn Berry uses `npmScopes` in `.yarnrc.yml` instead.
+</Note>
+
+## 4. Export the token wherever you install
+
+The `${GITHUB_TOKEN}` above is expanded from the environment at install time, so set it everywhere an install runs — your shell, your CI jobs, your Docker builds, and any platform that builds the app for you (Vercel, Netlify, Amplify, and similar).
+
+<CodeGroup>
+
+```bash npm
+export GITHUB_TOKEN=<your token>
+npm install @ourguide-ai/agent
+```
+
+```bash pnpm
+export GITHUB_TOKEN=<your token>
+pnpm add @ourguide-ai/agent
+```
+
+```bash yarn
+export GITHUB_TOKEN=<your token>
+yarn add @ourguide-ai/agent
+```
+
+</CodeGroup>
+
+<Warning>
+  Keep the token out of source control. Because `.npmrc` references `${GITHUB_TOKEN}` rather than the token itself, the file stays safe to commit — but if you paste a literal token in, add `.npmrc` to your `.gitignore`.
+</Warning>
+
+## Troubleshooting
+
+| Symptom | Cause |
+| ------- | ----- |
+| `401 Unauthorized` | `GITHUB_TOKEN` is unset or empty in the environment running the install. |
+| `403 Forbidden` | The token exists but lacks the `read:packages` scope, or it is a fine-grained token. |
+| `404 Not Found` | Your account has not been granted access to the package (step 1). GitHub returns `404` rather than revealing that a private package exists. |
+| Works locally, fails in CI | The token is exported in your shell but not in the CI environment or Docker build. |
+
+## Next steps
+
+<Card title="Quickstart" icon="rocket" href="/agent-sdk/quickstart">
+  Initialize the SDK, claim a session, and run your first task
+</Card>

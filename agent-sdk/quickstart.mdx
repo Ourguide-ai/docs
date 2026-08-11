@@ -3,30 +3,33 @@ title: "Quickstart"
 description: "Run your first agent task in about 15 minutes"
 ---
 
-Integrate `@argide/agent` end to end: install the package, initialize it in the browser, add the server-side claim endpoint, and run your first task.
+Integrate `@ourguide-ai/agent` end to end: install the package, initialize it in the browser, add the server-side claim endpoint, and run your first task.
 
 ## Before you start
 
 You need:
 
+- Access to the package on GitHub Packages, and a token configured — see [Installation](/agent-sdk/installation).
 - Your Product ID and an `ak_live_...` API key from your [dashboard](https://dashboard.argide.ai).
 - Your API host (`apiUrl`) from the same dashboard, e.g. `https://<your-argide-api-host>`.
 - A backend that can keep the API key secret and expose one new endpoint.
 
 ## 1. Install
 
+The SDK is a restricted package on GitHub Packages, so it needs an access grant and a token before this works. [Installation](/agent-sdk/installation) covers that setup once; with it in place:
+
 <CodeGroup>
 
 ```bash npm
-npm install @argide/agent
+npm install @ourguide-ai/agent
 ```
 
 ```bash pnpm
-pnpm add @argide/agent
+pnpm add @ourguide-ai/agent
 ```
 
 ```bash yarn
-yarn add @argide/agent
+yarn add @ourguide-ai/agent
 ```
 
 </CodeGroup>
@@ -36,7 +39,7 @@ yarn add @argide/agent
 Call `init` once, wherever your page boots. It is idempotent and safe under React StrictMode — call it from anywhere, any number of times.
 
 ```ts
-import { ArgideAgent } from "@argide/agent";
+import { ArgideAgent } from "@ourguide-ai/agent";
 
 ArgideAgent.init({
   apiUrl: process.env.NEXT_PUBLIC_ARGIDE_AGENT_API_URL!,
