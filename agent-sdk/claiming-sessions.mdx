@@ -25,7 +25,7 @@ Pass `claim` to `init` and the SDK calls it at exactly the right moment — only
 
 ```ts
 ArgideAgent.init({
-  apiUrl: "https://<your-argide-api-host>",
+  apiUrl: "https://api.argide.ai",
   productId: "YOUR_PRODUCT_ID",
   claim: async ({ sessionId, pairingCode }) => {
     const res = await fetch("/api/argide/claim", {
@@ -62,7 +62,7 @@ if (!recovered) {
 Your server performs the claim with one HTTP call:
 
 ```bash
-curl -X POST "https://<your-argide-api-host>/api/agent/v1/sessions/claim" \
+curl -X POST "https://api.argide.ai/api/agent/v1/sessions/claim" \
   -H "Authorization: Bearer ak_live_..." \
   -H "Content-Type: application/json" \
   -d '{"sessionId": "<sessionId>", "pairingCode": "<pairingCode>"}'

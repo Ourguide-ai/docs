@@ -11,7 +11,6 @@ You need:
 
 - Access to the package on GitHub Packages, and a token configured — see [Installation](/agent-sdk/installation).
 - Your Product ID and an `ak_live_...` API key from your [dashboard](https://dashboard.argide.ai).
-- Your API host (`apiUrl`) from the same dashboard, e.g. `https://<your-argide-api-host>`.
 - A backend that can keep the API key secret and expose one new endpoint.
 
 ## 1. Install
@@ -116,7 +115,7 @@ export async function POST(req: Request) {
 Set the environment variables:
 
 ```bash .env.local
-NEXT_PUBLIC_ARGIDE_AGENT_API_URL=https://<your-argide-api-host>
+NEXT_PUBLIC_ARGIDE_AGENT_API_URL=https://api.argide.ai
 NEXT_PUBLIC_ARGIDE_AGENT_PRODUCT_ID=YOUR_PRODUCT_ID
 ARGIDE_AGENT_API_KEY=ak_live_...
 ```
