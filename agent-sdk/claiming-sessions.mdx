@@ -11,13 +11,13 @@ Every browser tab running the SDK gets a session. A session can't run tasks unti
 stateDiagram-v2
     [*] --> Minted: init() in a fresh tab
     Minted --> Claimed: your server claims the pair
-    Claimed --> Recovered: reload / hard navigation
+    Claimed --> Recovered: page reload
     Recovered --> Recovered: further reloads
 ```
 
 - **Minted** — `init()` created a new session and produced `{ sessionId, pairingCode }`. `do()` queues until the claim lands; an unclaimed session's tasks are refused by the server.
 - **Claimed** — your server exchanged the pair for a claim. Tasks run.
-- **Recovered** — after a reload or hard navigation, the SDK re-attaches to the existing session. It is already claimed; no new pairing code is issued.
+- **Recovered** — after a page reload, the SDK re-attaches to the existing session. It is already claimed; no new pairing code is issued.
 
 ## Default path: the `claim` callback
 
