@@ -54,6 +54,17 @@
             ]
           },
           {
+            "group": "Agent SDK",
+            "pages": [
+              "agent-sdk/overview",
+              "agent-sdk/installation",
+              "agent-sdk/quickstart",
+              "agent-sdk/claiming-sessions",
+              "agent-sdk/running-tasks",
+              "agent-sdk/api-reference"
+            ]
+          },
+          {
             "group": "Knowledge Base",
             "pages": [
               "knowledge-base/knowledge-base",

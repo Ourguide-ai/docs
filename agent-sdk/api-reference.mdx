@@ -1,0 +1,96 @@
+---
+title: "API Reference"
+description: "Every method, option, type, and error in @ourguide-ai/agent"
+---
+
+```ts
+import { ArgideAgent, startAgentRuntime } from "@ourguide-ai/agent";
+```
+
+`ArgideAgent` is a facade that owns one runtime per page — it is what most integrations use. [`startAgentRuntime`](#startagentruntime) is the lower-level primitive it wraps.
+
+## ArgideAgent.init(options)
+
+Initializes the page's runtime. Idempotent and safe under React StrictMode — call it from anywhere, any number of times. On the server (SSR) it warns and does nothing; no session is minted until it runs in a browser.
+
+| Option | Type | Required | Description |
+| ------ | ---- | -------- | ----------- |
+| `apiUrl` | `string` | Yes | Your Argide API host, e.g. `https://<your-argide-api-host>` |
+| `productId` | `string` | Yes | The product this page belongs to |
+| `claim` | `({ sessionId, pairingCode }) => Promise<void>` | No | Called only when a session is freshly minted — never on recovery. Exchange the pair for a claim via your server. Omit to claim through [your own channel](/agent-sdk/claiming-sessions#custom-path-your-own-channel). |
+| `onStateChange` | `(state) => void` | No | Reports the facade lifecycle: `"starting" \| "ready" \| "error" \| "stopped"` |
+
+## ArgideAgent.do(\{ goal \})
+
+Starts a task, or rejoins the running one.
+
+- Returns `Promise<{ taskId: string }>` — resolves as soon as the task exists, not when it finishes. Waits internally for init and the claim first.
+- Rejects with `409 SESSION_BUSY` when called with a *different* goal while a task is running.
+- Called with the *same* goal as the running task, it resolves with the same `taskId` (rejoin).
+
+## ArgideAgent.check(\{ taskId \})
+
+Fetches the authoritative outcome.
+
+- Returns `Promise<{ taskId, status, summary }>`. `status` is one of `running`, `completed`, `failed`, or `cancelled`; `summary` is a string or `null`.
+- Rejects on any non-2xx, including `404` for a task that is unknown or belongs to another session.
+
+## ArgideAgent.cancel(\{ taskId \})
+
+Ends the task early.
+
+- The returned promise resolves with the same `{ taskId, status, summary }` outcome shape as `check()`.
+- Rejects on any non-2xx, including `404` (unknown or foreign task) and `409` (task already terminal).
+
+## ArgideAgent.onActivity(callback)
+
+Subscribes to ephemeral, per-tab activity events. Returns an unsubscribe function.
+
+```ts
+const off = ArgideAgent.onActivity((activity) => {
+  // { kind: "tool-start" | "tool-end" | "idle", ... }
+});
+// later, to unsubscribe: off()
+```
+
+Additional event fields vary by `kind`. Activity is not persisted — for the authoritative outcome use `check()`.
+
+## ArgideAgent.session()
+
+Returns `Promise<{ sessionId, pairingCode, recovered }>` for claiming through your own channel.
+
+Claim only when `recovered` is `false` — a recovered session is already claimed, and re-claiming returns `409 ALREADY_CLAIMED`. See [Claiming Sessions](/agent-sdk/claiming-sessions).
+
+## ArgideAgent.stop()
+
+Tears down and resets the runtime. The next `init()` starts fresh. Normal pages never call this — the runtime is designed to live as long as the tab.
+
+- Local teardown only: it leaves a running task alive server-side. Use `cancel()` to end the task.
+
+## Errors
+
+| Error | Status | Surfaces from | What it means |
+| ----- | ------ | ------------- | ------------- |
+| `SESSION_BUSY` | 409 | `do()` | A task with a different goal is still running. Wait or `cancel()` first. |
+| `ALREADY_CLAIMED` | 409 | the claim endpoint | The session was already claimed. Reserved as the stolen-pairing-code signal — do not retry. |
+| Not found | 404 | `check()`, `cancel()` | Unknown `taskId`, or a task belonging to another session. |
+| Conflict | 409 | `cancel()` | The task is already terminal. |
+
+These codes describe server-side behavior. On the client, `do()`, `check()`, and `cancel()` reject with a plain `Error` whose message carries the HTTP status (e.g. `agent task create failed: HTTP 409`) — the codes themselves aren't exposed as properties on the error.
+
+## startAgentRuntime
+
+`ArgideAgent` owns one runtime per page. Drop down to the primitive it wraps when you need more than one product on a page, or you want to manage the lifecycle yourself:
+
+```ts
+import { startAgentRuntime } from "@ourguide-ai/agent";
+
+const argide = await startAgentRuntime({ apiUrl, productId });
+// argide.{ sessionId, pairingCode, recovered, do, check, cancel, onActivity, stop }
+```
+
+At this level the claim-on-recovered rule and concurrent-start guarding are your responsibility: check `recovered` before claiming, and guard against starting two runtimes concurrently yourself.
+
+<Card title="Integration requirements" icon="list-check" href="/agent-sdk/overview#integration-requirements">
+  What your stack must support before going live
+</Card>
