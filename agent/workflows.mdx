@@ -1,70 +1,36 @@
 ---
 title: "Workflows"
-description: "Create guided multi-step flows"
+description: "Record a task the agent can run again"
 ---
 
-Workflows guide users through complex tasks with a structured sequence of steps.
+A workflow is a task you record once so the agent can run it again for your users. Open **Tools**, then **Workflows**. Only an organization admin can record, edit, or delete a workflow.
 
-## Examples
-
-- **Onboarding** — Walk new users through setup
-- **Returns** — Collect order number, reason, process request
-- **Troubleshooting** — Diagnostic steps for common issues
-
-## Create a Workflow
+## Record a workflow
 
 <Steps>
-  <Step title="Navigate to Workflows">
-    Go to [Actions](https://dashboard.argide.ai/actions) in your dashboard.
+  <Step title="Start from a URL">
+    Enter the page where the task begins and click **Create New Workflow**.
   </Step>
-  <Step title="Create a new workflow">
-    Click **Create Journey**.
+  <Step title="Walk through the task">
+    Use the browser and narrate each step out loud.
   </Step>
-  <Step title="Fill in details">
-    | Field           | Description                                                        |
-    | --------------- | ------------------------------------------------------------------ |
-    | **Name**        | Short name (e.g., "Return Request")                                |
-    | **Description** | When to trigger (e.g., "Use when customer wants to return a product") |
+  <Step title="Stop recording">
+    Click **Stop Recording**. The recording becomes a workflow you can review.
   </Step>
-  <Step title="Add steps">
-    For each step, define:
-    - **Step text** — What to ask or tell the user
-    - **Tool** (optional) — Action to execute at this step
-  </Step>
-  <Step title="Save">
-    Save your workflow and test it in the Sandbox.
+  <Step title="Turn it on">
+    When the workflow is ready, enable it. You can edit or delete it from the list.
   </Step>
 </Steps>
 
-## Example: Return Request
+## How the agent runs it
 
-```text
-Step 1: "What's the order number for the item you'd like to return?"
+| Mode | What happens |
+| ---- | ------------ |
+| **Automated** | The agent carries out each step. Turn on **In-Page Actions** under **Tools** before you use this mode. |
+| **Guided** | The agent points at each control and the user clicks it. |
 
-Step 2: "Which item would you like to return?"
-        → Tool: getOrderDetails
+The agent collects inputs before the workflow starts. For an automated workflow, turn on **Collect input per-step** to ask for each input when that step needs it.
 
-Step 3: "What's the reason for the return?"
+## What your users see
 
-Step 4: "Done! You'll receive a return label within 24 hours."
-        → Tool: createReturnLabel
-```
-
-## How It Works
-
-1. User question matches workflow description
-2. Agent starts the flow
-3. User responds to each step
-4. Optional tools execute at configured steps
-5. Workflow completes
-
-<Info>
-  Users can exit anytime by asking something else.
-</Info>
-
-## Tips
-
-- **Write clear descriptions** so the agent knows when to trigger the workflow
-- **Keep steps conversational**, not robotic
-- **End with confirmation** of what happened
-- **Test in Sandbox** before deploying
+The agent asks before it starts. An automated workflow shows **Run workflow**. A guided workflow shows **Start walkthrough**.
