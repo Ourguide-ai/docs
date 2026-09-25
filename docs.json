@@ -3,11 +3,11 @@
   "theme": "mint",
   "name": "Argide",
   "logo": {
-    "light": "/logo/logo.jpg",
-    "dark": "/logo/logo.jpg",
+    "light": "/logo/light.png",
+    "dark": "/logo/dark.png",
     "href": "https://argide.mintlify.app"
   },
-  "favicon": "/logo/logo.jpg",
+  "favicon": "/logo/favicon.png",
   "colors": {
     "primary": "#16A34A",
     "light": "#4ADE80",
@@ -50,6 +50,7 @@
               "agent/actions",
               "agent/user-suggestions",
               "agent/page-navigation",
+              "agent/workflows",
               "agent/visibility"
             ]
           },
@@ -93,6 +94,12 @@
             "group": "Monitor",
             "pages": [
               "monitor/activity"
+            ]
+          },
+          {
+            "group": "Organization",
+            "pages": [
+              "organization/members"
             ]
           }
         ]
