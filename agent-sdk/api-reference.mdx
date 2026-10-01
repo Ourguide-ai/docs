@@ -19,7 +19,7 @@ Initializes the page's runtime. Idempotent and safe under React StrictMode — c
 | `productId` | `string` | Yes | The product this page belongs to |
 | `claim` | `({ sessionId, pairingCode }) => Promise<void>` | No | Called only when a session is freshly minted — never on recovery. Exchange the pair for a claim via your server. Omit to claim through [your own channel](/agent-sdk/claiming-sessions#custom-path-your-own-channel). |
 | `onStateChange` | `(state) => void` | No | Reports the facade lifecycle: `"starting" \| "ready" \| "error" \| "stopped"` |
-| `assetOrigin` | `string` | No | The Argide web app's origin, e.g. `https://dashboard.argide.ai`. Screenshots load their helper script from `<assetOrigin>/argide-rrweb-snapshot.js`. Only the origin is used. An invalid value makes `init` fail. Requires 0.2.0 or later. See [Let the agent see the page](/agent-sdk/quickstart#let-the-agent-see-the-page). |
+| `assetOrigin` | `string` | No | Set to `https://dashboard.argide.ai` to let the agent take screenshots. Requires 0.2.0 or later. |
 
 ## ArgideAgent.do(\{ goal \})
 
@@ -89,8 +89,6 @@ import { startAgentRuntime } from "@ourguide-ai/agent";
 const argide = await startAgentRuntime({ apiUrl, productId, assetOrigin });
 // argide.{ sessionId, pairingCode, recovered, do, check, cancel, onActivity, stop }
 ```
-
-`startAgentRuntime` takes the same `apiUrl`, `productId`, and optional `assetOrigin` as `init`. An invalid `assetOrigin` makes it reject before a session is minted.
 
 At this level the claim-on-recovered rule and concurrent-start guarding are your responsibility: check `recovered` before claiming, and guard against starting two runtimes concurrently yourself.
 

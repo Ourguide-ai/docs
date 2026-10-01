@@ -60,7 +60,7 @@ import { ArgideAgent } from "@ourguide-ai/agent";
 ArgideAgent.init({
   apiUrl: process.env.NEXT_PUBLIC_ARGIDE_AGENT_API_URL!,
   productId: process.env.NEXT_PUBLIC_ARGIDE_AGENT_PRODUCT_ID!,
-  // Where screenshots load their helper script. See "Let the agent see the page" below.
+  // Lets the agent take screenshots.
   assetOrigin: "https://dashboard.argide.ai",
   // Called only when a session is freshly minted — never on recovery.
   claim: async ({ sessionId, pairingCode }) => {
@@ -80,17 +80,7 @@ ArgideAgent.init({
 
 ### Let the agent see the page
 
-When the agent can't reach an element through the page's structure, it takes a screenshot and acts by position. Screenshots need a small helper script that the Argide web app serves. `assetOrigin` tells the SDK where to load it from.
-
-- Set `assetOrigin` in your first `init` call. A second `init` call is ignored while the first is active.
-- The helper loads from `https://dashboard.argide.ai/argide-rrweb-snapshot.js` the first time the agent takes a screenshot. If your page sets a Content-Security-Policy, add `https://dashboard.argide.ai` to `script-src`.
-- Only the origin is used, so a URL with a path works too.
-- An invalid value (not an absolute `http` or `https` URL) makes `init` fail: `onStateChange` reports `"error"` and `do()` rejects.
-- Without `assetOrigin`, screenshots work only on pages where the Argide [chat widget](/setup/embed-widget) has already loaded the helper. Elsewhere they fail, and the agent sees the reason and works around it.
-
-<Note>
-  `assetOrigin` requires `@ourguide-ai/agent` 0.2.0 or later.
-</Note>
+`assetOrigin` lets the agent take screenshots of the page. If your page sets a Content-Security-Policy, add `https://dashboard.argide.ai` to `script-src`.
 
 ## 3. Add the claim endpoint on your server
 
