@@ -78,10 +78,6 @@ ArgideAgent.init({
   On the server (SSR), `init` warns and does nothing. No session is minted until it runs in a real browser.
 </Note>
 
-### Let the agent see the page
-
-`assetOrigin` lets the agent take screenshots of the page. If your page sets a Content-Security-Policy, add `https://dashboard.argide.ai` to `script-src`.
-
 ## 3. Add the claim endpoint on your server
 
 The `claim` callback above posts the session's `{ sessionId, pairingCode }` pair to your backend. Your backend exchanges the pair for a claim using your `ak_live_...` key — until that happens, the session can't run tasks.
