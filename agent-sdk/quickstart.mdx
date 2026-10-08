@@ -158,7 +158,7 @@ const outcome = await ArgideAgent.check({ taskId });
 // { taskId, status, summary }
 ```
 
-`status` is one of `running`, `completed`, `failed`, or `cancelled`; `summary` is a string or `null`.
+`status` is one of `running`, `needs_input`, `completed`, `failed`, or `cancelled`; `summary` is a string or `null`. A `needs_input` task is waiting for the user — see [When the agent needs the user](/agent-sdk/running-tasks#when-the-agent-needs-the-user).
 
 `do()` resolves as soon as the task exists — not when it finishes — and waits internally for init and the claim to complete first, so you never have to check "is it ready".
 
