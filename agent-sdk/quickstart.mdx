@@ -60,6 +60,8 @@ import { ArgideAgent } from "@ourguide-ai/agent";
 ArgideAgent.init({
   apiUrl: process.env.NEXT_PUBLIC_ARGIDE_AGENT_API_URL!,
   productId: process.env.NEXT_PUBLIC_ARGIDE_AGENT_PRODUCT_ID!,
+  // Lets the agent take screenshots.
+  assetOrigin: "https://dashboard.argide.ai",
   // Called only when a session is freshly minted — never on recovery.
   claim: async ({ sessionId, pairingCode }) => {
     const res = await fetch("/api/argide/claim", {
