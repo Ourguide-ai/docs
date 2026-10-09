@@ -28,7 +28,7 @@ A task that is waiting for the user (`needs_input`) doesn't hold the session: `d
 
 ```ts
 const outcome = await ArgideAgent.check({ taskId });
-// { taskId, status, summary }
+// { taskId, status, summary, needs }
 ```
 
 `status` is one of `running`, `needs_input`, `completed`, `failed`, or `cancelled`; `summary` is a string or `null`.
@@ -45,6 +45,7 @@ const outcome = await ArgideAgent.check({ taskId });
 if (outcome.status === "needs_input") {
   if (outcome.needs?.kind === "input") {
     // Show outcome.summary and a form built from outcome.needs.fields.
+    // Here the task asked for one field, named "Role".
     await ArgideAgent.resume({ taskId, inputs: { Role: "admin" } });
   } else {
     // "user_action": show outcome.summary, then resume once the user has done it.

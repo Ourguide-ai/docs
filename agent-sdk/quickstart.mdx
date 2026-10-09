@@ -155,7 +155,7 @@ Any backend works — the endpoint just forwards the pair to `POST {apiUrl}/api/
 const { taskId } = await ArgideAgent.do({ goal: "cancel my subscription" });
 
 const outcome = await ArgideAgent.check({ taskId });
-// { taskId, status, summary }
+// { taskId, status, summary, needs }
 ```
 
 `status` is one of `running`, `needs_input`, `completed`, `failed`, or `cancelled`; `summary` is a string or `null`. A `needs_input` task is waiting for the user — see [When the agent needs the user](/agent-sdk/running-tasks#when-the-agent-needs-the-user).
