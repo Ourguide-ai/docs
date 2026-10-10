@@ -21,9 +21,14 @@ Initializes the page's runtime. Idempotent and safe under React StrictMode — c
 | `onStateChange` | `(state) => void` | No | Reports the facade lifecycle: `"starting" \| "ready" \| "error" \| "stopped"` |
 | `assetOrigin` | `string` | Yes | Set to `https://dashboard.argide.ai` to let the agent take screenshots. |
 
-## ArgideAgent.do(\{ goal \})
+## ArgideAgent.do(\{ goal, messages \})
 
 Starts a task, or rejoins the running one.
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `goal` | `string` | Yes | What the agent should do. |
+| `messages` | `object[]` | No | Your chatbot's conversation, in your stack's own message format. Only user and assistant text is sent. See [Pass the conversation](/agent-sdk/running-tasks#pass-the-conversation). |
 
 - Returns `Promise<{ taskId: string }>` — resolves as soon as the task exists, not when it finishes. Waits internally for init and the claim first.
 - Rejects with `409 SESSION_BUSY` when called with a *different* goal while a task is running.

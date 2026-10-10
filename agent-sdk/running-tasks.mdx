@@ -13,6 +13,19 @@ const { taskId } = await ArgideAgent.do({ goal: "cancel my subscription" });
 
 `do()` resolves as soon as the task exists — not when it finishes. It also waits internally for `init` and the claim to complete, so you can call it right after `init` with no readiness check.
 
+## Pass the conversation
+
+When the goal comes from your chatbot, pass its conversation too. The agent then understands follow-ups like "now schedule **it** weekly".
+
+```ts
+const { taskId } = await ArgideAgent.do({
+  goal: "Schedule the Q3 report weekly",
+  messages: conversation.messages, // as your stack holds them
+});
+```
+
+Pass the messages in your stack's own format: OpenAI, Anthropic, Gemini, the Vercel AI SDK, and A2A all work. Only user and assistant text leaves the page. The agent acts only on `goal`, so put everything it must do there.
+
 ## One goal at a time
 
 Each session runs at most one task. What `do()` does while a task is running depends on the goal:
